@@ -40,10 +40,14 @@ export function renderTerminalPrompt(
 }
 
 const BOOT_LINES = [
-  'GRID SYNC........OK',
-  'ASCII ENGINE.....ONLINE',
-  'AUDIO BRIDGE.....ARMED',
-  'SIGNAL-9.........READY',
+  'COLD BOOT..................OK',
+  'MIL-TERM BIOS..............LOCKED',
+  'PACKET VERIFICATION........PASS',
+  'MEMORY SCAN................03 NODES',
+  'BROADCAST AUTH.............ACCEPTED',
+  'ASCII VISUAL ENGINE........ONLINE',
+  'AUDIO REACTIVE BRIDGE......ARMED',
+  'SIGNAL ACQUISITION.........READY',
 ];
 
 export function renderBootSequence(): string {

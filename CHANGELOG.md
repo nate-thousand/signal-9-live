@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Version 0.1 Functional Prototype
+
+- Upgraded the entry flow into a cold Resistance terminal boot with diagnostics, signal acquisition, broadcast authentication, CRT interference, and press-ENTER transition.
+- Rebuilt the Broadcast Terminal as the v0.1 Home Terminal HUD: left chat terminal, center ASCII Visual Engine frame, right Signal 9 Radio and mission console, and bottom telemetry bar.
+- Wired Signal 9 Radio controls to the existing MP3/audio-reactive/video ASCII session path, including local soundtrack presets, play/stop/restart, waveform, spectrum, playback progress, and volume telemetry.
+- Added live HUD telemetry for frequency, signal strength, Echo status, Memory Nodes, broadcast state, CPU estimate, FPS, current mission, district, and system time.
+- Kept Platform packages, engines, app content, soundtrack, and lore intact while refining only app-owned startup, terminal, adapter telemetry, and documentation.
+
 ### Signal 9 Design Language
 
 - Added the official documentation-only Signal 9 visual operating philosophy in `docs/VISUAL_LANGUAGE.md`.

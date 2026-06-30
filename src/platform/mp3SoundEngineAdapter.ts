@@ -21,6 +21,13 @@ export interface CreateMp3SoundEngineAdapterOptions {
 export interface Signal9Mp3SoundAdapter extends SoundEngineAdapter {
   loadTrack(src: string, autoplay?: boolean): Promise<void>;
   getCurrentTrack(): string;
+  getPlaybackSnapshot(): {
+    currentTime: number;
+    duration: number;
+    volume: number;
+    playing: boolean;
+  };
+  setVolume(volume: number): void;
 }
 
 interface AnalyzerState {
@@ -105,6 +112,7 @@ export function createMp3SoundEngineAdapter(
   let mediaSource: MediaElementAudioSourceNode | null = null;
   let audioReady = false;
   let playing = false;
+  let currentVolume = 1;
   let currentPresetId: string | null = 'transmission';
   let lastError: string | null = null;
   const parameterSnapshot: Record<string, number> = {
@@ -150,6 +158,7 @@ export function createMp3SoundEngineAdapter(
     audio.preload = 'auto';
     audio.loop = true;
     audio.crossOrigin = 'anonymous';
+    audio.volume = currentVolume;
     mediaSource = audioContext.createMediaElementSource(audio);
     mediaSource.connect(analyser);
   };
@@ -226,6 +235,24 @@ export function createMp3SoundEngineAdapter(
 
     getCurrentTrack(): string {
       return currentAudioSrc;
+    },
+
+    getPlaybackSnapshot() {
+      return {
+        currentTime: audio?.currentTime ?? 0,
+        duration: Number.isFinite(audio?.duration) ? (audio?.duration ?? 0) : 0,
+        volume: audio?.volume ?? 1,
+        playing,
+      };
+    },
+
+    setVolume(volume: number): void {
+      const nextVolume = clamp01(volume);
+      currentVolume = nextVolume;
+      if (audio) {
+        audio.volume = nextVolume;
+      }
+      emit('sound:parameter-change', { name: 'volume', value: nextVolume });
     },
 
     async loadTrack(src: string, autoplay = false): Promise<void> {

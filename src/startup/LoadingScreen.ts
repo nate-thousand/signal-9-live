@@ -33,10 +33,14 @@ export function mountLoadingScreen(
     <section class="s9-startup s9-loading s9-startup--enter" aria-labelledby="s9-loading-title">
       <div class="s9-startup__backdrop" aria-hidden="true">
         <div class="s9-startup__grid"></div>
+        <div class="s9-startup__noise s9-startup__noise--dense"></div>
+        <div class="s9-startup__sweep"></div>
         <div class="s9-startup__scanlines"></div>
+        <div class="s9-startup__interference"></div>
       </div>
       <div class="s9-startup__content s9-loading__content">
         <div class="s9-loading__mark" data-s9-logo-mount></div>
+        <p class="s9-startup__status">RESISTANCE COMMUNICATIONS TERMINAL</p>
         <div class="s9-terminal s9-terminal--boot" data-s9-boot-lines>
           ${renderBootSequence()}
         </div>

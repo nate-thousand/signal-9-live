@@ -2,7 +2,7 @@
 
 Underground resistance broadcast experience built on [Plantasonic Platform](https://github.com/) architecture — a **standalone** app that references the platform without living inside its monorepo.
 
-**Chat is the game.** After the preserved startup sequence (loading → title → begin transmission), the **Broadcast Terminal** becomes the primary interface: GHOST (AI) narrates, missions evolve through conversation, and every response can retune soundtrack, video-to-ASCII, lore, and mission state.
+**Chat is the game.** After the cold boot entry sequence, the **Home Terminal** becomes the permanent interface: left-side chat, center ASCII Visual Engine, right-side Signal 9 Radio, and a bottom system HUD. GHOST (AI) narrates, missions evolve through conversation, and every response can retune soundtrack, video-to-ASCII, lore, and mission state.
 
 > **Development status:** See [ROADMAP.md](ROADMAP.md) — the single source of truth for phases, completion status, and milestones.
 
@@ -12,10 +12,10 @@ Underground resistance broadcast experience built on [Plantasonic Platform](http
 |-------|------|--------|
 | 1 | Foundation (Plantasonic, DS, shell) | ✅ Complete |
 | 2 | Visual experience (startup, ASCII engine, video) | ✅ Complete |
-| 3 | Audio engine (Broadcast Deck, MP3 presets) | 🚧 In Progress |
+| 3 | Audio engine (Signal 9 Radio, MP3 presets) | 🚧 In Progress |
 | 4 | AI platform (chat, structured responses) | 🚧 In Progress |
 | 5 | Game (locations, lore, missions) | 🚧 In Progress |
-| 6 | Retro console UI (Broadcast Terminal) | 🚧 In Progress |
+| 6 | Retro console UI (Home Terminal HUD) | 🚧 In Progress |
 | 7 | Asset library (manifest) | 🚧 In Progress |
 | 8 | Visual reactivity (audio + AI driven) | ✅ Complete |
 | 9 | Content creation tools | ⬜ Planned |
@@ -25,10 +25,13 @@ Underground resistance broadcast experience built on [Plantasonic Platform](http
 
 | Area | Status |
 |------|--------|
-| Startup / ASCII logo / title sequence | **Preserved** — permanent brand assets |
-| Broadcast Deck (MP3 + preset engine) | **Live** — left panel + MENU controls |
+| Entry Screen / ASCII logo / title sequence | **Live** — cold boot, diagnostics, Signal acquisition, press ENTER |
+| Home Terminal shell | **Live** — left chat, center ASCII engine, right radio, bottom HUD |
+| Signal 9 Radio (MP3 + preset engine) | **Live** — local soundtrack playback, track selector, waveform, spectrum, volume |
+| Radio source selector | **Prototype** — Mixcloud, SoundCloud, and streaming radio modes selectable; external ingest pending |
 | AI Chat Terminal | **Live** — stub AI offline; OpenAI when `OPENAI_API_KEY` set |
-| ASCII Visual Display | **Live** — video-to-ASCII + audio reactive bridge |
+| ASCII Visual Display | **Live** — existing video-to-ASCII engine + audio reactive bridge |
+| Bottom HUD telemetry | **Live** — frequency, signal, Echo, Memory Nodes, TX, CPU, FPS, mission, district, time |
 | Image overlay | **Live** — manifest-driven background images |
 | Mission / Lore panel | **Partial** — unlocks list titles; full body text pending |
 | Game state persistence | **Live** — `localStorage` (`signal9-broadcast-state-v1`) |
@@ -41,7 +44,7 @@ Underground resistance broadcast experience built on [Plantasonic Platform](http
 ```bash
 cp .env.example .env
 # Add OPENAI_API_KEY — optional; stub AI works without it
-pnpm dev
+npm run dev
 ```
 
 Dev server exposes `POST /api/broadcast/chat` (Vite middleware). Production static builds need a matching API host for live AI — see ROADMAP Phase 4.
@@ -56,7 +59,7 @@ Dev server exposes `POST /api/broadcast/chat` (Vite middleware). Production stat
 
 ## Experience flow
 
-0. **Loading** → **Title** → **Start Run** → **Broadcast Terminal** (mission briefing auto-launches transmission)
+0. **Cold boot** → **Signal authentication** → **Press ENTER** → **Home Terminal**
 
 Legacy screen ids (`beat-runner`) delegate to the broadcast terminal. Mission debrief remains available for future scoring loops.
 
@@ -127,8 +130,8 @@ pnpm install && pnpm build
 ## Run
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
 Opens at http://localhost:5177
@@ -137,10 +140,10 @@ Opens at http://localhost:5177
 
 | Command | Purpose |
 |---------|---------|
-| `pnpm dev` | Vite dev server |
-| `pnpm build` | Production build |
-| `pnpm typecheck` | TypeScript check |
-| `pnpm validate` | Thin-app + navigation validation |
+| `npm run dev` | Vite dev server |
+| `npm run build` | Production build |
+| `npm run typecheck` | TypeScript check |
+| `npm run validate` | Thin-app + navigation validation |
 
 ## Architecture
 
@@ -183,23 +186,21 @@ The app only:
 - passes audio features through the Audio Reactive Bridge
 - renders UI overlays (mission flow, transmission bar)
 
-`AppShell` mounts `mountInstrumentApp()` once in a persistent instrument layer; the **Broadcast Terminal** screen overlays the ASCII stage (status bar, deck, lore, chat, choices, footer).
+`AppShell` mounts `mountInstrumentApp()` once in a persistent instrument layer; the **Home Terminal** overlays the ASCII stage with the chat terminal, visual engine frame, Signal 9 Radio, mission console, choices, and bottom HUD telemetry.
 
-### Broadcast Terminal layout
+### Home Terminal layout
 
 ```
-┌─ STATUS: SIGNAL 9 · location · mission · NET · TX ─────────────┐
-│ DECK          │  ASCII / VIDEO STAGE (instrument layer)  │ LORE │
-│ play · track  │  (transparent center — engine canvas)      │ objs │
-├───────────────┴────────────────────────────────────────────┴──────┤
-│ CHAT history + command input                                      │
-│ [ AI choice ] [ AI choice ] [ AI choice ]                         │
+┌─ SIGNAL 9 // mission · district · NET · TX ───────────────────────┐
+│ CHAT TERMINAL │ ASCII VISUAL ENGINE (transparent center) │ RADIO  │
+│ history/input │ video-to-ASCII + telemetry reticle       │ waves  │
+│ choices       │ existing Platform stage canvas           │ mission│
 ├───────────────────────────────────────────────────────────────────┤
-│ FOOTER: track · visual preset · ASCII · system · AI status        │
+│ HUD: freq · signal · Echo · memory · TX · CPU · FPS · mission · time│
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-Mobile collapses side panels; chat, visuals, soundtrack, and choices stay usable.
+Mobile collapses the equipment bays while preserving chat, visuals, radio controls, choices, and HUD telemetry.
 
 ### AI architecture
 

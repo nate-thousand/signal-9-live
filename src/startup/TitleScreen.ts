@@ -22,6 +22,9 @@ export function mountTitleScreen(root: HTMLElement, options: TitleScreenOptions)
     <section class="s9-startup s9-title s9-startup--enter" aria-labelledby="s9-title-heading">
       <div class="s9-startup__backdrop" aria-hidden="true">
         <div class="s9-startup__grid s9-startup__grid--animated"></div>
+        <div class="s9-startup__noise"></div>
+        <div class="s9-startup__glow"></div>
+        <div class="s9-startup__sweep"></div>
         <div class="s9-startup__scanlines"></div>
       </div>
 
@@ -29,8 +32,9 @@ export function mountTitleScreen(root: HTMLElement, options: TitleScreenOptions)
         <div class="s9-startup__content s9-title__content">
           <div class="s9-title__mark" data-s9-logo-mount></div>
           <div class="s9-terminal s9-terminal--static">
-            ${renderTerminalLine('REVOLUTION IS BROADCAST')}
-            ${renderTerminalPrompt('INIT TRANSMISSION', { id: 's9-title-input', autofocus: true })}
+            ${renderTerminalLine('SIGNAL ACQUIRED // PROJECT DIGITAL HARMONY BLIND SPOT OPEN')}
+            ${renderTerminalLine('MUSIC IS CIVILIZATION // MEMORY IS RESISTANCE')}
+            ${renderTerminalPrompt('PRESS ENTER', { id: 's9-title-input', autofocus: true })}
           </div>
         </div>
       </div>

@@ -14,10 +14,10 @@ Signal 9 is an **AI-first interactive cyberpunk broadcast terminal** built on th
 |-------|------|--------|------------|
 | 1 | Foundation | ✅ Complete | ~95% |
 | 2 | Visual Experience | ✅ Complete | ~90% |
-| 3 | Audio Engine | 🚧 In Progress | ~70% |
+| 3 | Audio Engine | 🚧 In Progress | ~78% |
 | 4 | AI Platform | 🚧 In Progress | ~65% |
-| 5 | Signal 9 Game | 🚧 In Progress | ~35% |
-| 6 | Retro Console UI | 🚧 In Progress | ~75% |
+| 5 | Signal 9 Game | 🚧 In Progress | ~40% |
+| 6 | Retro Console UI | 🚧 In Progress | ~88% |
 | 7 | Asset Library | 🚧 In Progress | ~60% |
 | 8 | Visual Reactivity | ✅ Complete | ~85% |
 | 9 | Content Creation Tools | ⬜ Planned | ~0% |
@@ -26,15 +26,15 @@ Signal 9 is an **AI-first interactive cyberpunk broadcast terminal** built on th
 
 ### What works today
 
-After **Loading → Title → Begin Transmission**, the player enters the **Broadcast Terminal**: a retro console overlay on the live ASCII/video stage. GHOST (AI) returns structured JSON that can retune soundtrack, video-to-ASCII, mission state, lore unlocks, character discoveries, and player choices. Game state persists in `localStorage`. Stub AI works without an API key; OpenAI works in dev/preview when `OPENAI_API_KEY` is set.
+After **Cold boot → Signal authentication → Press ENTER**, the player enters the **Home Terminal**: a permanent resistance communications HUD with chat on the left, the live ASCII/video stage in the center, Signal 9 Radio on the right, and a bottom telemetry bar. GHOST (AI) returns structured JSON that can retune soundtrack, video-to-ASCII, mission state, lore unlocks, character discoveries, and player choices. Game state persists in `localStorage`. Stub AI works without an API key; OpenAI works in dev/preview when `OPENAI_API_KEY` is set.
 
 ### Immediate next milestones
 
 1. **Production AI API** — serverless route for static `dist/` deployments
 2. **Plantasonic Platform Integration implementation prep** — review the import map and approve the future Platform/App Kit mount API before runtime import changes
-3. **Rich lore panel** — render full transmission body text, not just titles
-4. **GIF export UI** — wire engine export APIs to Menu panel (documented but not built)
-5. **Branding cleanup** — align legacy "Beat Runner" labels with Broadcast Terminal direction
+3. **External radio ingest** — connect Mixcloud, SoundCloud, and streaming radio modes beyond prototype source selection
+4. **Rich lore panel** — render full transmission body text, not just titles
+5. **GIF export UI** — wire engine export APIs to Menu panel (documented but not built)
 6. **Mission completion flow** — wire debrief or remove dead navigation paths
 
 ---
@@ -136,7 +136,7 @@ All stage output is rendered by `ascii-visual-engine` through the Plantasonic `V
 
 ### Goal
 
-Reframe the transmission player as the **Signal 9 Broadcast Deck** — preset-bound soundtracks that react to mission, location, mood, and AI state.
+Reframe the transmission player as the **Signal 9 Radio** — preset-bound soundtracks and future external relays that react to mission, location, mood, and AI state.
 
 ### Description
 
@@ -149,7 +149,8 @@ Mission audio uses local MP3 files analyzed via Web Audio (`mp3SoundEngineAdapte
 | Four preset MP3 tracks | ✅ | `public/assets/audio/`, `transmissionTracks.ts` |
 | MP3 sound adapter + Web Audio analysis | ✅ | `mp3SoundEngineAdapter.ts` |
 | Audio Reactive Bridge integration | ✅ | `signal9AudioReactive.ts`, `presetBundles.ts` |
-| Broadcast Deck (left panel controls) | ✅ | `mountBroadcastTerminal.ts` |
+| Signal 9 Radio panel | ✅ | `mountBroadcastTerminal.ts` |
+| Waveform / spectrum / progress / volume UI | ✅ | `mountBroadcastTerminal.ts`, `mp3SoundEngineAdapter.ts` |
 | Full deck in MENU (presets + transport) | ✅ | `TransmissionControls.ts`, `ControlMenu.ts` |
 | AI-driven track switching | ✅ | `applyBroadcastResponse.ts` |
 | Preset theme + bridge on switch | ✅ | `applySignal9Preset.ts` |
@@ -158,9 +159,9 @@ Mission audio uses local MP3 files analyzed via Web Audio (`mp3SoundEngineAdapte
 | `startup.mp3` on disk | 🚧 | Present but not wired in code |
 | Playlist / queue support | ⬜ | — |
 | Crossfade between tracks | ⬜ | — |
-| Mixcloud integration | ⬜ | — |
-| SoundCloud integration | ⬜ | — |
-| Streaming radio mode | ⬜ | — |
+| Mixcloud integration | 🚧 | Source selector exists; ingest/auth pending |
+| SoundCloud integration | 🚧 | Source selector exists; ingest/auth pending |
+| Streaming radio mode | 🚧 | Source selector exists; stream URL handling pending |
 | Asset manifest (songs) | ✅ | `src/assets/manifest.ts` |
 
 ### Dependencies
@@ -289,14 +290,15 @@ The Broadcast Terminal is the primary post-entry UI: status bar, deck, transpare
 
 | Deliverable | Status | Location |
 |-------------|--------|----------|
-| Broadcast Terminal layout | ✅ | `mountBroadcastTerminal.ts` |
+| Home Terminal HUD layout | ✅ | `mountBroadcastTerminal.ts` |
 | Terminal screen layer mode | ✅ | `AppShell`, `app-layout.scss` |
-| Status bar (SIGNAL 9, location, mission, NET, TX) | ✅ | Broadcast Terminal |
-| Command terminal + chat history | ✅ | Broadcast Terminal |
-| Three dynamic AI choice buttons | ✅ | Broadcast Terminal |
-| Broadcast Deck panel | ✅ | Left panel |
-| Mission / Lore panel | ✅ | Right panel |
-| Footer telemetry | ✅ | Track, visual, ASCII, AI status |
+| Header status bar (SIGNAL 9, location, mission, NET, TX) | ✅ | Home Terminal |
+| Command terminal + chat history | ✅ | Left panel |
+| Three dynamic AI choice buttons | ✅ | Left panel |
+| Center ASCII Visual Engine frame | ✅ | Transparent over Platform stage |
+| Signal 9 Radio panel | ✅ | Right panel |
+| Mission / Memory / Echo panels | ✅ | Right panel |
+| Bottom HUD telemetry | ✅ | Frequency, signal, Echo, memory, TX, CPU, FPS, mission, district, time |
 | Responsive console (mobile collapse) | ✅ | `broadcast-terminal.scss` |
 | Terminal primitives (boot lines, prompts) | ✅ | `src/ui/terminal.ts` |
 | Control Menu (collapsible) | ✅ | `ControlMenu.ts` |
