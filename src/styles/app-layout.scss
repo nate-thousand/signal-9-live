@@ -13,7 +13,14 @@ body,
   overflow: hidden;
 }
 
-/* Stage + platform chrome (transport, presets, inspector) */
+/*
+ * Stage + platform chrome (transport, presets, inspector).
+ * Full-viewport by default — used as a backdrop for fullscreen/dimmed screens
+ * (mission briefing, debrief, start run). While the Home HUD (broadcast
+ * terminal) is mounted, `src/platform/scopedVisualStage.ts` overrides the
+ * inner stage node's position/size inline so the engine renders only inside
+ * the center visual panel instead of behind the whole HUD.
+ */
 .s9-instrument-layer {
   position: absolute;
   inset: 0;

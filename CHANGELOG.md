@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### ASCII Engine Scoped To HUD Panels
+
+- Stopped the Plantasonic ASCII Visual Engine canvas from rendering as a full-viewport background behind the Home HUD.
+- Added `src/platform/scopedVisualStage.ts`, which confines the engine's existing stage DOM node to the center visual panel's on-screen bounds while the broadcast terminal is mounted, and releases that scoping (back to full-bleed) when navigating to other screens.
+- Wired the new scoping into `mountBroadcastTerminal.ts` mount/unmount lifecycle; no Platform files, engine internals, or audio behavior were changed.
+- Confirmed the existing lightweight HUD ASCII modules (waveform, spectrum, Echo portrait, network map, telemetry bars, memory node preview) were already panel-scoped and clipped via `overflow: hidden` on their own classes — no glyphs float over unrelated panels.
+
 ### Version 0.1 Functional Prototype
 
 - Upgraded the entry flow into a cold Resistance terminal boot with diagnostics, signal acquisition, broadcast authentication, CRT interference, and press-ENTER transition.

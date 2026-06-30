@@ -293,7 +293,9 @@ The application must feel like operating an underground resistance broadcast sys
 
 ### Description
 
-The Broadcast Terminal is the primary post-entry UI: status bar, deck, transparent center (engine stage), lore panel, chat terminal, AI choice buttons, and footer telemetry. Platform chrome (MENU, VIDEO ASCII, transmission bar) remains accessible at the bottom. Design system components are reused; Signal 9 adds layout and atmosphere via `--s9-*` tokens only.
+The Broadcast Terminal is the primary post-entry UI: status bar, deck, center visual panel (scoped engine stage), lore panel, chat terminal, AI choice buttons, and footer telemetry. Platform chrome (MENU, VIDEO ASCII, transmission bar) remains accessible at the bottom. Design system components are reused; Signal 9 adds layout and atmosphere via `--s9-*` tokens only.
+
+The Platform ASCII Visual Engine canvas no longer renders as a full-viewport background behind the HUD. `src/platform/scopedVisualStage.ts` confines the engine's existing stage DOM node to the center visual panel's on-screen bounds while the Home HUD is mounted; other screens (mission briefing/debrief, start run) keep the engine's default full-bleed backdrop.
 
 ### Deliverables
 
@@ -304,7 +306,7 @@ The Broadcast Terminal is the primary post-entry UI: status bar, deck, transpare
 | Header status bar (SIGNAL 9, location, mission, NET, TX) | ✅ | Home Terminal |
 | Command terminal + chat history | ✅ | Left panel |
 | Three dynamic AI choice buttons | ✅ | Left panel |
-| Center ASCII Visual Engine frame | ✅ | Transparent over Platform stage |
+| Center ASCII Visual Engine frame | ✅ | Scoped to panel — `scopedVisualStage.ts` |
 | Signal 9 Radio panel | ✅ | Right panel |
 | Embedded ASCII HUD visual modules | ✅ | `src/ui/hudVisuals/` |
 | Latest transmission waveform | ✅ | Chat + radio panels |
@@ -415,6 +417,7 @@ Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, wh
 | Background image blend on AI signal | ✅ | `[data-s9-bg-image]` overlay |
 | HUD waveform / spectrum / packet instruments | ✅ | `src/ui/hudVisuals/`, `mountBroadcastTerminal.ts` |
 | Echo portrait / network pulse / globe telemetry | ✅ | Derived from game + network + AI state |
+| ASCII engine scoped to HUD panels (no full-screen background) | ✅ | `src/platform/scopedVisualStage.ts` |
 | ASCII reacts to explicit gameplay events | 🚧 | Only via AI preset changes |
 | Video sync to beat clock | ⬜ | — |
 | Image crossfade transitions | ⬜ | Instant opacity today |
