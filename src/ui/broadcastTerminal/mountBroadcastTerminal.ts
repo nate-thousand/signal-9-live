@@ -11,7 +11,6 @@ import {
 import { broadcastGameState } from '../../game/gameState.js';
 import type { CharacterFile, ConversationTurn, LoreEntry } from '../../game/types.js';
 import { applySignal9Preset } from '../../platform/applySignal9Preset.js';
-import { bindScopedVisualStage } from '../../platform/scopedVisualStage.js';
 import { getSignal9Mp3Adapter } from '../../platform/signal9SoundIntegration.js';
 import { getSignal9VisualAdapter } from '../../platform/signal9VisualIntegration.js';
 import {
@@ -318,10 +317,8 @@ function renderMissionPanel(): string {
 }
 
 /**
- * Center HUD panel hosting the scoped Platform ASCII visual engine. The
- * engine's stage node is repositioned/resized to this panel's bounds by
- * `bindScopedVisualStage()` in `mountBroadcastTerminal()` — it no longer
- * paints as a full-screen layer behind the rest of the terminal.
+ * Center HUD panel placeholder for future scoped visuals. The global Platform
+ * ASCII stage is intentionally disabled for the Broadcast Terminal.
  */
 function renderVisualizerFrame(): string {
   const s = broadcastGameState.getState();
@@ -766,11 +763,6 @@ export function mountBroadcastTerminal(root: HTMLElement): () => void {
   bindDeckControls(root);
   bindChoiceHandlers(root);
 
-  // Scope the Platform ASCII visual engine to the center visual panel only —
-  // it must not paint as a full-viewport background behind chat/radio/mission.
-  const visualPanel = root.querySelector<HTMLElement>('[data-s9-broadcast-center]');
-  const unbindVisualStage = visualPanel ? bindScopedVisualStage(visualPanel) : (): void => {};
-
   const form = root.querySelector<HTMLFormElement>('[data-s9-chat-form]');
   const input = root.querySelector<HTMLInputElement>('[data-s9-chat-input]');
   input?.focus();
@@ -798,7 +790,6 @@ export function mountBroadcastTerminal(root: HTMLElement): () => void {
     window.clearInterval(telemetryTimer);
     window.removeEventListener('keydown', onKeyDown);
     unsubscribe();
-    unbindVisualStage();
     root.innerHTML = '';
   };
 }

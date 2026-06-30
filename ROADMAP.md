@@ -296,9 +296,9 @@ The application must feel like operating an underground resistance broadcast sys
 
 ### Description
 
-The Broadcast Terminal is the primary post-entry UI: status bar, deck, center visual panel (scoped engine stage), lore panel, chat terminal, AI choice buttons, and footer telemetry. Platform chrome (MENU, VIDEO ASCII, transmission bar) remains accessible at the bottom. Design system components are reused; Signal 9 adds layout and atmosphere via `--s9-*` tokens only.
+The Broadcast Terminal is the primary post-entry UI: status bar, deck, center visual panel placeholder, lore panel, chat terminal, AI choice buttons, and footer telemetry. Design system components are reused; Signal 9 adds layout and atmosphere via `--s9-*` tokens only.
 
-The Platform ASCII Visual Engine canvas no longer renders as a full-viewport background behind the HUD. `src/platform/scopedVisualStage.ts` confines the engine's existing stage DOM node to the center visual panel's on-screen bounds while the Home HUD is mounted; other screens (mission briefing/debrief, start run) keep the engine's default full-bleed backdrop.
+The Platform ASCII Visual Engine canvas is disabled completely for the Broadcast Terminal so no global ASCII animation can render behind the HUD. Future panel-owned visual engine targets are documented as a TODO placeholder in `src/platform/scopedHudVisuals.ts`; scoped HUD visuals are not implemented yet.
 
 ### Deliverables
 
@@ -309,7 +309,7 @@ The Platform ASCII Visual Engine canvas no longer renders as a full-viewport bac
 | Header status bar (track, source, elapsed, remaining, TX, frequency, preset, visual mode) | ✅ | Home Terminal |
 | Command terminal + chat history | ✅ | Left panel |
 | Three dynamic AI choice buttons | ✅ | Left panel |
-| Center ASCII Visual Engine frame | ✅ | Scoped to panel — `scopedVisualStage.ts` |
+| Center visual engine placeholder | ✅ | No global background; future TODO in `scopedHudVisuals.ts` |
 | Signal 9 Radio panel | ✅ | Right panel |
 | Embedded ASCII HUD visual modules | ✅ | `src/ui/hudVisuals/` |
 | Latest transmission waveform | ✅ | Chat + radio panels — live analyzer waveform/stereo |
@@ -322,7 +322,7 @@ The Platform ASCII Visual Engine canvas no longer renders as a full-viewport bac
 | Responsive console (mobile collapse) | ✅ | `broadcast-terminal.scss` |
 | Terminal primitives (boot lines, prompts) | ✅ | `src/ui/terminal.ts` |
 | Control Menu (collapsible) | ✅ | `ControlMenu.ts` |
-| VIDEO ASCII panel | ✅ | `VideoTransmissionControls.ts` |
+| VIDEO ASCII panel | 🚧 | Platform control exists, but global visual stage disabled in Broadcast Terminal |
 | Transmission debug overlay (`?debug`) | ✅ | `transmissionDebugOverlay.ts` |
 | Official Signal 9 design language | ✅ | `docs/VISUAL_LANGUAGE.md` |
 | Art direction doctrine | ✅ | `docs/ART_DIRECTION.md` |
@@ -414,7 +414,7 @@ Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, wh
 | Audio reactive boost tuning | ✅ | `audioReactiveConfig.ts` |
 | Bass emoji / glyph scale pulse | ✅ | `bassEmojiPulse.ts`, `AsciiEngine` |
 | AI-driven preset + video switch | ✅ | `applyBroadcastResponse.ts` |
-| AI-driven ASCII profile apply | ✅ | `applyVideoAsciiProfileForPreset` |
+| AI-driven ASCII profile apply | ✅ | Engine-ready; Broadcast Terminal global stage disabled |
 | Transmission control sliders (sync) | ✅ | `transmissionControlState.ts` |
 | Threshold / effect 25%–75% bands | ✅ | `transmissionControls.ts` |
 | Video post passes (threshold, feedback, scanlines, glitch) | ✅ | Engine + adapter |
@@ -422,7 +422,7 @@ Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, wh
 | HUD waveform / spectrum / packet instruments | ✅ | `src/ui/hudVisuals/`, `mountBroadcastTerminal.ts` |
 | Live FFT bars, peak indicators, and waveform samples | ✅ | `mp3SoundEngineAdapter.ts`, `AsciiSpectrum.ts`, `AsciiWaveform.ts` |
 | Echo portrait / network pulse / globe telemetry | ✅ | Derived from game + network + AI state |
-| ASCII engine scoped to HUD panels (no full-screen background) | ✅ | `src/platform/scopedVisualStage.ts` |
+| Future scoped HUD visual targets | ⬜ | TODO placeholder: `src/platform/scopedHudVisuals.ts` |
 | ASCII reacts to explicit gameplay events | 🚧 | Only via AI preset changes |
 | Video sync to beat clock | ⬜ | — |
 | Image crossfade transitions | ⬜ | Instant opacity today |

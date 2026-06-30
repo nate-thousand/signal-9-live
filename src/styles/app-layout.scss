@@ -16,10 +16,9 @@ body,
 /*
  * Stage + platform chrome (transport, presets, inspector).
  * Full-viewport by default — used as a backdrop for fullscreen/dimmed screens
- * (mission briefing, debrief, start run). While the Home HUD (broadcast
- * terminal) is mounted, `src/platform/scopedVisualStage.ts` overrides the
- * inner stage node's position/size inline so the engine renders only inside
- * the center visual panel instead of behind the whole HUD.
+ * (mission briefing, debrief, start run). The Broadcast Terminal disables this
+ * global layer entirely; future scoped HUD visuals belong in explicit panel
+ * mounts described by `src/platform/scopedHudVisuals.ts`.
  */
 .s9-instrument-layer {
   position: absolute;
@@ -47,6 +46,20 @@ body,
 
 .s9-screen-layer > * {
   pointer-events: auto;
+}
+
+/* Home HUD: solid console backdrop — no ASCII visible in grid gutters */
+.s9-app-root[data-s9-screen-mode='terminal'] .s9-screen-layer {
+  background: var(--s9-bg, #030306);
+}
+
+/*
+ * Broadcast Terminal: no global ASCII background layer. The instrument layer
+ * can remain mounted for app/session services, but it is not displayed in the
+ * Home HUD.
+ */
+.s9-app-root[data-s9-screen-mode='terminal'] .s9-instrument-layer {
+  display: none !important;
 }
 
 /* Briefing / debrief: mission panel covers the stage */

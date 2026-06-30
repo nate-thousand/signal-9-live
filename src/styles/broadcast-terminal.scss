@@ -66,7 +66,7 @@
   min-width: 0;
   padding: 0.55rem 0.75rem;
   border-block-end: 1px solid color-mix(in srgb, var(--s9-accent, #9b5dff) 38%, transparent);
-  background: color-mix(in srgb, var(--s9-bg, #030306) 90%, transparent);
+  background: color-mix(in srgb, var(--s9-bg, #030306) 98%, transparent);
   box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--s9-text, #f1eef7) 8%, transparent);
 }
 
@@ -132,7 +132,13 @@
 
 .s9-broadcast__chat,
 .s9-broadcast__panel,
-.s9-broadcast__mini-panel,
+.s9-broadcast__mini-panel {
+  border: 1px solid color-mix(in srgb, var(--s9-accent, #9b5dff) 28%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--s9-bg, #030306) 96%, transparent), color-mix(in srgb, var(--s9-bg, #030306) 92%, transparent)),
+    repeating-linear-gradient(90deg, transparent 0 7px, color-mix(in srgb, var(--s9-text, #f1eef7) 3%, transparent) 7px 8px);
+}
+
 .s9-broadcast__visual {
   border: 1px solid color-mix(in srgb, var(--s9-accent, #9b5dff) 28%, transparent);
   background:
@@ -294,6 +300,7 @@
 .s9-broadcast__visual-reticle {
   position: absolute;
   inset: 3rem 2.4rem;
+  z-index: 2;
   border: 1px solid color-mix(in srgb, var(--s9-text, #f1eef7) 12%, transparent);
 }
 
@@ -522,7 +529,7 @@
   overflow: hidden;
   padding: 0.48rem 0.7rem;
   border-block-start: 1px solid color-mix(in srgb, var(--s9-accent, #9b5dff) 35%, transparent);
-  background: color-mix(in srgb, var(--s9-bg, #030306) 92%, transparent);
+  background: color-mix(in srgb, var(--s9-bg, #030306) 98%, transparent);
   color: color-mix(in srgb, var(--s9-text, #f1eef7) 54%, transparent);
   font-size: 0.64em;
   white-space: nowrap;
@@ -637,9 +644,9 @@
   pointer-events: none;
 }
 
-/* Terminal screen mode: platform ASCII stage remains visible through center. */
+/* Terminal screen mode: no global Platform ASCII stage behind the HUD. */
 .s9-app-root[data-s9-screen-mode='terminal'] .s9-instrument-layer {
-  z-index: 1;
+  display: none !important;
 }
 
 .s9-app-root[data-s9-screen-mode='terminal'] .s9-screen-layer {

@@ -2,19 +2,25 @@
 
 ## Unreleased
 
+### Broadcast Terminal Global ASCII Background Removed
+
+- Removed the Broadcast Terminal's active scoped-stage binding and deleted the temporary `scopedVisualStage.ts` implementation.
+- Disabled the Platform instrument/stage layer entirely in terminal mode so the full-screen ASCII Visual Engine canvas cannot render behind chat, radio, mission, header, or footer HUD panels.
+- Added `src/platform/scopedHudVisuals.ts` as the TODO placeholder for future panel-owned visual engine mounts; scoped HUD visuals are intentionally not implemented yet.
+- Preserved startup screens, app shell mounting, chat, HUD panels, audio playback, MP3 analysis, and existing lightweight ASCII HUD widgets.
+
 ### Signal 9 Radio HUD Integration
 
 - Added live FFT, waveform, peak, RMS, signal strength, transmission quality, stereo balance, and downsampled analyzer data from the MP3 adapter for HUD use.
 - Upgraded the Broadcast Deck with play, pause, previous, next, restart, seek, volume, mute, source, current track, timing, and diagnostic readouts without changing the audio engine or Platform code.
 - Connected the left waveform, right spectrum analyzer, system monitor bars, center visual telemetry, status bar, and packet meters to the currently playing soundtrack.
 - Added four recovered ambient tape assets to the radio deck and asset manifest, plus three alternate video ASCII source loops in the VIDEO ASCII source list.
-- Preserved the panel-scoped Visual Engine mount; no full-screen ASCII background was reintroduced.
+- Preserved the audio-reactive HUD widgets; the global Visual Engine stage is now disabled in the Broadcast Terminal.
 
 ### ASCII Engine Scoped To HUD Panels
 
 - Stopped the Plantasonic ASCII Visual Engine canvas from rendering as a full-viewport background behind the Home HUD.
-- Added `src/platform/scopedVisualStage.ts`, which confines the engine's existing stage DOM node to the center visual panel's on-screen bounds while the broadcast terminal is mounted, and releases that scoping (back to full-bleed) when navigating to other screens.
-- Wired the new scoping into `mountBroadcastTerminal.ts` mount/unmount lifecycle; no Platform files, engine internals, or audio behavior were changed.
+- Superseded the temporary scoped-stage approach with a full terminal-mode stage disable and a future `scopedHudVisuals.ts` TODO placeholder.
 - Confirmed the existing lightweight HUD ASCII modules (waveform, spectrum, Echo portrait, network map, telemetry bars, memory node preview) were already panel-scoped and clipped via `overflow: hidden` on their own classes — no glyphs float over unrelated panels.
 
 ### Version 0.1 Functional Prototype
