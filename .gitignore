@@ -7,3 +7,4 @@ dist/
 !.env.example
 pnpm-lock.yaml
 signal-9-handoff-*.rtf
+.vercel
