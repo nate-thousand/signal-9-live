@@ -60,9 +60,9 @@
 .s9-broadcast__header {
   grid-area: header;
   display: grid;
-  grid-template-columns: minmax(16rem, 1fr) auto auto auto auto;
+  grid-template-columns: minmax(12rem, 1fr) repeat(9, max-content);
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
   min-width: 0;
   padding: 0.55rem 0.75rem;
   border-block-end: 1px solid color-mix(in srgb, var(--s9-accent, #9b5dff) 38%, transparent);
@@ -86,7 +86,7 @@
 
 .s9-broadcast__header-stat {
   overflow: hidden;
-  max-inline-size: 15rem;
+  max-inline-size: 12rem;
   color: color-mix(in srgb, var(--s9-text, #f1eef7) 76%, transparent);
   font-size: 0.72em;
   white-space: nowrap;
@@ -369,6 +369,19 @@
   opacity: 0.62;
 }
 
+.s9-radio__album-art {
+  position: absolute;
+  inset-block-start: 0.45rem;
+  inset-inline: 0.55rem;
+  z-index: 2;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--s9-text, #f1eef7) 64%, transparent);
+  font-size: 0.16em;
+  letter-spacing: 0.16em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .s9-radio__source,
 .s9-radio__track,
 .s9-radio__meta {
@@ -423,7 +436,7 @@
 
 .s9-radio__controls {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.4rem;
   margin: 0.65rem;
 }
@@ -441,6 +454,11 @@
 }
 
 .s9-radio__volume input {
+  accent-color: var(--s9-accent, #9b5dff);
+}
+
+.s9-radio__seek {
+  margin: 0.35rem 0.65rem 0;
   accent-color: var(--s9-accent, #9b5dff);
 }
 

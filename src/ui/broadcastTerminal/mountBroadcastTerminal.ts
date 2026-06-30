@@ -1,7 +1,11 @@
 import { applyBroadcastResponse } from '../../ai/applyBroadcastResponse.js';
 import { sendBroadcastChat } from '../../ai/chatClient.js';
 import {
+  getAmbientTrack,
+  isAmbientTrackId,
+  SIGNAL_9_AMBIENT_TRACKS,
   SIGNAL_9_PRESET_TRACK_LIST,
+  type Signal9AmbientTrack,
   type Signal9PresetTrackId,
 } from '../../audio/transmissionTracks.js';
 import { broadcastGameState } from '../../game/gameState.js';
@@ -37,8 +41,20 @@ import {
 } from '../hudVisuals/index.js';
 
 type RadioSource = 'local' | 'mixcloud' | 'soundcloud' | 'relay';
+type DeckTrackId = Signal9PresetTrackId | Signal9AmbientTrack['id'];
+
+interface DeckTrack {
+  id: DeckTrackId;
+  label: string;
+  track: string;
+  src?: string;
+  kind: 'preset' | 'ambient';
+}
 
 let radioSource: RadioSource = 'local';
+let activeDeckTrackId: DeckTrackId = 'broadcast';
+let muted = false;
+let previousVolume = 1;
 
 function escapeHtml(text: string): string {
   return text
@@ -61,8 +77,46 @@ function formatTime(seconds: number): string {
   return `${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
 }
 
+function formatRemaining(currentTime: number, duration: number): string {
+  if (!Number.isFinite(duration) || duration <= 0) return '--:--';
+  return `-${formatTime(Math.max(0, duration - currentTime))}`;
+}
+
+function deckTracks(): DeckTrack[] {
+  return [
+    ...SIGNAL_9_PRESET_TRACK_LIST.map((track) => ({
+      id: track.id,
+      label: track.label,
+      track: track.track,
+      kind: 'preset' as const,
+    })),
+    ...SIGNAL_9_AMBIENT_TRACKS.map((track) => ({
+      id: track.id,
+      label: track.label,
+      track: track.track,
+      src: track.src,
+      kind: 'ambient' as const,
+    })),
+  ];
+}
+
+function getDeckTrack(trackId: string): DeckTrack {
+  return (
+    deckTracks().find((track) => track.id === trackId) ??
+    deckTracks().find((track) => track.id === activeDeckTrackId) ??
+    deckTracks()[0]!
+  );
+}
+
+function stepDeckTrack(direction: -1 | 1): DeckTrack {
+  const tracks = deckTracks();
+  const currentIndex = Math.max(0, tracks.findIndex((track) => track.id === activeDeckTrackId));
+  const nextIndex = (currentIndex + direction + tracks.length) % tracks.length;
+  return tracks[nextIndex]!;
+}
+
 function activeTrackLabel(trackId: string): string {
-  return SIGNAL_9_PRESET_TRACK_LIST.find((track) => track.id === trackId)?.track ?? trackId;
+  return getDeckTrack(trackId).track;
 }
 
 function frequencyForTrack(trackId: string): string {
@@ -93,6 +147,10 @@ function sourceLabel(source: RadioSource): string {
   }
 }
 
+function visualModeLabel(): string {
+  return 'PANEL ASCII';
+}
+
 function renderHistory(): string {
   const { conversationHistory } = broadcastGameState.getState();
   return conversationHistory
@@ -117,13 +175,22 @@ function renderChoices(): string {
 
 function renderStatusBar(): string {
   const s = broadcastGameState.getState();
+  const snapshot = getSignal9Mp3Adapter()?.getPlaybackSnapshot();
+  const deckTrack = getDeckTrack(activeDeckTrackId);
+  const elapsed = formatTime(snapshot?.currentTime ?? 0);
+  const remaining = formatRemaining(snapshot?.currentTime ?? 0, snapshot?.duration ?? 0);
   return `
     <header class="s9-broadcast__header" data-s9-broadcast-status>
       <span class="s9-broadcast__brand">SIGNAL 9 // RESISTANCE OPERATING TERMINAL</span>
-      <span class="s9-broadcast__header-stat" data-s9-stat="mission">${escapeHtml(s.currentMission)}</span>
-      <span class="s9-broadcast__header-stat" data-s9-stat="location">${escapeHtml(s.currentLocation)}</span>
-      <span class="s9-broadcast__header-stat s9-broadcast__stat--${s.networkStatus}" data-s9-stat="network">NET ${s.networkStatus.toUpperCase()}</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="track">TRK ${escapeHtml(deckTrack.track)}</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="episode">EP LIVE</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="source">SRC ${sourceLabel(radioSource)}</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="elapsed">EL ${elapsed}</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="remaining">REM ${remaining}</span>
       <span class="s9-broadcast__header-stat s9-broadcast__stat--${s.broadcastStatus}" data-s9-stat="broadcast">TX ${s.broadcastStatus.toUpperCase()}</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="frequency">FRQ ${isAmbientTrackId(activeDeckTrackId) ? '00.0' : frequencyForTrack(s.currentTrack)} FM</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="preset">PRE ${escapeHtml(isAmbientTrackId(activeDeckTrackId) ? 'AMBIENT' : s.currentTrack.toUpperCase())}</span>
+      <span class="s9-broadcast__header-stat" data-s9-stat="visual-mode">VIS ${visualModeLabel()}</span>
     </header>
   `;
 }
@@ -132,11 +199,16 @@ function renderRadioPanel(): string {
   const s = broadcastGameState.getState();
   const adapter = getSignal9Mp3Adapter();
   const snapshot = adapter?.getPlaybackSnapshot();
+  const analysis = adapter?.getAudioAnalysis();
+  const deckTrack = getDeckTrack(activeDeckTrackId);
   const playing = snapshot?.playing ?? false;
   const duration = snapshot?.duration ?? 0;
   const currentTime = snapshot?.currentTime ?? 0;
   const progress = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
   const volume = Math.round((snapshot?.volume ?? 1) * 100);
+  const peak = Math.round((analysis?.peak ?? 0) * 99);
+  const rms = Math.round((analysis?.rms ?? 0) * 99);
+  const quality = Math.round((analysis?.transmissionQuality ?? 0) * 99);
   return `
     <aside class="s9-broadcast__panel s9-broadcast__radio" data-s9-broadcast-radio>
       <div class="s9-broadcast__panel-chrome">
@@ -146,33 +218,46 @@ function renderRadioPanel(): string {
 
       <div class="s9-radio__art" aria-hidden="true">
         <div class="s9-radio__art-grid"></div>
+        <span class="s9-radio__album-art" data-s9-album-art>${escapeHtml(deckTrack.label)}</span>
         ${renderAsciiGlobe()}
       </div>
 
       <p class="s9-radio__source" data-s9-radio-source>${sourceLabel(radioSource)}</p>
-      <p class="s9-radio__track" data-s9-deck-track>${escapeHtml(activeTrackLabel(s.currentTrack))}</p>
-      <p class="s9-radio__meta">FREQ <span data-s9-radio-frequency>${frequencyForTrack(s.currentTrack)}</span> FM // MOOD <span data-s9-deck-mood>${escapeHtml(s.currentMood)}</span></p>
+      <p class="s9-radio__track" data-s9-deck-track>${escapeHtml(deckTrack.track)}</p>
+      <p class="s9-radio__meta">FREQ <span data-s9-radio-frequency>${isAmbientTrackId(activeDeckTrackId) ? '00.0' : frequencyForTrack(s.currentTrack)}</span> FM // MOOD <span data-s9-deck-mood>${escapeHtml(isAmbientTrackId(activeDeckTrackId) ? 'recovered' : s.currentMood)}</span></p>
+      <p class="s9-radio__meta">PK <span data-s9-audio-peak>${peak}</span> // RMS <span data-s9-audio-rms>${rms}</span> // Q <span data-s9-audio-quality>${quality}</span></p>
 
       <div class="s9-radio__waveform" data-s9-waveform aria-hidden="true">${renderAsciiWaveform()}</div>
       <div class="s9-radio__progress" aria-label="Playback progress">
         <span data-s9-radio-progress style="inline-size:${progress}%"></span>
       </div>
+      <input class="s9-radio__seek" data-s9-radio-seek type="range" min="0" max="1000" value="${Math.round(progress * 10)}" aria-label="Seek transmission" />
       <div class="s9-radio__time">
         <span data-s9-radio-time>${formatTime(currentTime)}</span>
         <span data-s9-radio-duration>${formatTime(duration)}</span>
+        <span data-s9-radio-remaining>${formatRemaining(currentTime, duration)}</span>
       </div>
 
       <div class="s9-radio__spectrum" data-s9-spectrum aria-hidden="true">${renderAsciiSpectrum()}</div>
 
       <div class="s9-radio__controls">
-        <button type="button" class="s9-broadcast__btn" data-s9-deck="play" aria-pressed="${playing}">${playing ? 'STOP' : 'PLAY'}</button>
+        <button type="button" class="s9-broadcast__btn" data-s9-deck="previous">PREV</button>
+        <button type="button" class="s9-broadcast__btn" data-s9-deck="play" aria-pressed="${playing}">PLAY</button>
+        <button type="button" class="s9-broadcast__btn" data-s9-deck="pause" aria-pressed="${!playing}">PAUSE</button>
+        <button type="button" class="s9-broadcast__btn" data-s9-deck="next">NEXT</button>
         <button type="button" class="s9-broadcast__btn" data-s9-deck="restart">RST</button>
+        <button type="button" class="s9-broadcast__btn" data-s9-deck="mute" aria-pressed="${muted}">${muted ? 'UNMUTE' : 'MUTE'}</button>
       </div>
 
       <label class="s9-radio__field">
         <span>TRACK</span>
         <select data-s9-radio-preset>
-          ${SIGNAL_9_PRESET_TRACK_LIST.map((track) => `<option value="${track.id}" ${track.id === s.currentTrack ? 'selected' : ''}>${track.label}</option>`).join('')}
+          <optgroup label="CARRIER PRESETS">
+            ${SIGNAL_9_PRESET_TRACK_LIST.map((track) => `<option value="${track.id}" ${track.id === s.currentTrack ? 'selected' : ''}>${track.label}</option>`).join('')}
+          </optgroup>
+          <optgroup label="AMBIENT TAPES">
+            ${SIGNAL_9_AMBIENT_TRACKS.map((track) => `<option value="${track.id}">${escapeHtml(track.label)}</option>`).join('')}
+          </optgroup>
         </select>
       </label>
 
@@ -253,10 +338,12 @@ function renderVisualizerFrame(): string {
         ${renderAsciiSignalMeter('broadcast', 'Broadcast')}
       </div>
       <div class="s9-broadcast__visual-telemetry" aria-hidden="true">
-        <span>THRESHOLD</span>
-        <span>DITHER</span>
-        <span>FREQ SCAN</span>
-        <span>PACKET ACTIVITY</span>
+        <span data-s9-visual-threshold>THR --</span>
+        <span data-s9-visual-dither>DITH --</span>
+        <span data-s9-visual-motion>MOT --</span>
+        <span data-s9-visual-feedback>FDBK --</span>
+        <span data-s9-visual-glitch>GLT --</span>
+        <span data-s9-visual-brightness>BRT --</span>
       </div>
     </section>
   `;
@@ -321,14 +408,22 @@ function scrollChatToBottom(root: HTMLElement): void {
 
 function patchDom(root: HTMLElement): void {
   const s = broadcastGameState.getState();
-  root.querySelector<HTMLElement>('[data-s9-stat="location"]')!.textContent = s.currentLocation;
-  root.querySelector<HTMLElement>('[data-s9-stat="mission"]')!.textContent = s.currentMission;
+  const snapshot = getSignal9Mp3Adapter()?.getPlaybackSnapshot();
+  const deckTrack = getDeckTrack(activeDeckTrackId);
+  root.querySelector<HTMLElement>('[data-s9-stat="track"]')!.textContent = `TRK ${deckTrack.track}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="source"]')!.textContent = `SRC ${sourceLabel(radioSource)}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="elapsed"]')!.textContent = `EL ${formatTime(snapshot?.currentTime ?? 0)}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="remaining"]')!.textContent = `REM ${formatRemaining(snapshot?.currentTime ?? 0, snapshot?.duration ?? 0)}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="frequency"]')!.textContent = `FRQ ${frequencyForTrack(s.currentTrack)} FM`;
+  root.querySelector<HTMLElement>('[data-s9-stat="preset"]')!.textContent = `PRE ${s.currentTrack.toUpperCase()}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="visual-mode"]')!.textContent = `VIS ${visualModeLabel()}`;
   root.querySelector<HTMLElement>('[data-s9-objective]')!.textContent = s.currentMission;
-  root.querySelector<HTMLElement>('[data-s9-deck-track]')!.textContent = activeTrackLabel(s.currentTrack);
-  root.querySelector<HTMLElement>('[data-s9-deck-mood]')!.textContent = s.currentMood;
-  root.querySelector<HTMLElement>('[data-s9-radio-frequency]')!.textContent = frequencyForTrack(s.currentTrack);
+  root.querySelector<HTMLElement>('[data-s9-deck-track]')!.textContent = deckTrack.track;
+  root.querySelector<HTMLElement>('[data-s9-album-art]')!.textContent = deckTrack.label;
+  root.querySelector<HTMLElement>('[data-s9-deck-mood]')!.textContent = isAmbientTrackId(activeDeckTrackId) ? 'recovered' : s.currentMood;
+  root.querySelector<HTMLElement>('[data-s9-radio-frequency]')!.textContent = isAmbientTrackId(activeDeckTrackId) ? '00.0' : frequencyForTrack(s.currentTrack);
   const presetSelect = root.querySelector<HTMLSelectElement>('[data-s9-radio-preset]');
-  if (presetSelect && s.currentTrack !== 'blackout') presetSelect.value = s.currentTrack;
+  if (presetSelect) presetSelect.value = activeDeckTrackId;
   root.querySelector<HTMLElement>('[data-s9-chat-history]')!.innerHTML = renderHistory();
   root.querySelector<HTMLElement>('[data-s9-choices]')!.innerHTML = renderChoices();
   root.querySelector<HTMLElement>('[data-s9-lore-list]')!.innerHTML =
@@ -351,7 +446,7 @@ function patchDom(root: HTMLElement): void {
   root.querySelector<HTMLElement>('[data-s9-footer-ascii]')!.textContent = `ASCII ${s.currentAsciiPreset}`;
   root.querySelector<HTMLElement>('[data-s9-footer-mission]')!.textContent = s.currentMission;
   root.querySelector<HTMLElement>('[data-s9-footer-district]')!.textContent = s.currentLocation;
-  root.querySelector<HTMLElement>('[data-s9-hud-frequency]')!.textContent = `${frequencyForTrack(s.currentTrack)} FM`;
+  root.querySelector<HTMLElement>('[data-s9-hud-frequency]')!.textContent = `${isAmbientTrackId(activeDeckTrackId) ? '00.0' : frequencyForTrack(s.currentTrack)} FM`;
   root.querySelector<HTMLElement>('[data-s9-hud-memory]')!.textContent = String(s.unlockedLore.length);
   root.querySelector<HTMLElement>('[data-s9-hud-broadcast]')!.textContent = s.broadcastStatus.toUpperCase();
   root.querySelector<HTMLElement>('[data-s9-memory-preview]')!.textContent =
@@ -413,39 +508,94 @@ function bindChoiceHandlers(root: HTMLElement): void {
   });
 }
 
+async function loadDeckTrack(root: HTMLElement, track: DeckTrack, autoplay = true): Promise<void> {
+  activeDeckTrackId = track.id;
+
+  if (track.kind === 'ambient') {
+    const ambient = getAmbientTrack(track.id);
+    if (!ambient) return;
+    await getSignal9Mp3Adapter()?.loadTrack(ambient.src, autoplay);
+    broadcastGameState.patch({
+      broadcastStatus: autoplay ? 'live' : 'standby',
+      systemMessage: `Ambient tape loaded: ${ambient.label}`,
+    });
+    broadcastGameState.appendConversation({
+      role: 'system',
+      text: `AMBIENT TAPE RECOVERED — ${ambient.track.toUpperCase()}`,
+      timestamp: new Date().toISOString(),
+    });
+    patchDom(root);
+    return;
+  }
+
+  const presetId = track.id as Signal9PresetTrackId;
+  const instrumentRoot = document.querySelector<HTMLElement>('[data-s9-instrument-layer]');
+  if (!instrumentRoot) return;
+  await applySignal9Preset(instrumentRoot, presetId);
+  if (autoplay) {
+    await startTransmissionSession();
+    await playVideoTransmission();
+  }
+  broadcastGameState.patch({
+    currentTrack: presetId,
+    currentMood: presetId === 'interference' ? 'unstable' : presetId === 'jammer' ? 'hostile' : presetId === 'uplink' ? 'focused' : 'tense',
+    broadcastStatus: getSignal9Mp3Adapter()?.getStatus().playing ? 'live' : 'standby',
+    systemMessage: `Radio preset loaded: ${activeTrackLabel(presetId)}`,
+  });
+  patchDom(root);
+}
+
 function bindDeckControls(root: HTMLElement): void {
   root.querySelector<HTMLButtonElement>('[data-s9-deck="play"]')?.addEventListener('click', () => {
-    const adapter = getSignal9Mp3Adapter();
-    if (!adapter) return;
-    const playing = adapter.getStatus().playing;
-    if (playing) {
-      void stopTransmissionSession().then(() => pauseVideoTransmission());
-    } else {
-      void startTransmissionSession().then(() => playVideoTransmission());
-    }
-    broadcastGameState.patch({ broadcastStatus: playing ? 'standby' : 'live' });
-    patchDom(root);
+    void startTransmissionSession().then(() => {
+      if (!isAmbientTrackId(activeDeckTrackId)) {
+        return playVideoTransmission();
+      }
+    }).then(() => {
+      broadcastGameState.patch({ broadcastStatus: 'live' });
+      patchDom(root);
+    });
+  });
+
+  root.querySelector<HTMLButtonElement>('[data-s9-deck="pause"]')?.addEventListener('click', () => {
+    void stopTransmissionSession().then(() => pauseVideoTransmission()).then(() => {
+      broadcastGameState.patch({ broadcastStatus: 'standby' });
+      patchDom(root);
+    });
+  });
+
+  root.querySelector<HTMLButtonElement>('[data-s9-deck="previous"]')?.addEventListener('click', () => {
+    void loadDeckTrack(root, stepDeckTrack(-1), true);
+  });
+
+  root.querySelector<HTMLButtonElement>('[data-s9-deck="next"]')?.addEventListener('click', () => {
+    void loadDeckTrack(root, stepDeckTrack(1), true);
   });
 
   root.querySelector<HTMLButtonElement>('[data-s9-deck="restart"]')?.addEventListener('click', () => {
+    getSignal9Mp3Adapter()?.seekTo(0);
     void restartVideoTransmission().then(() => startTransmissionSession());
     broadcastGameState.patch({ broadcastStatus: 'live' });
+  });
+
+  root.querySelector<HTMLButtonElement>('[data-s9-deck="mute"]')?.addEventListener('click', () => {
+    muted = !muted;
+    const adapter = getSignal9Mp3Adapter();
+    if (muted) {
+      previousVolume = adapter?.getPlaybackSnapshot().volume ?? previousVolume;
+    } else {
+      adapter?.setVolume(previousVolume);
+      root.querySelector<HTMLInputElement>('[data-s9-radio-volume-input]')!.value = String(Math.round(previousVolume * 100));
+      root.querySelector<HTMLElement>('[data-s9-radio-volume]')!.textContent = String(Math.round(previousVolume * 100));
+    }
+    adapter?.setMuted(muted);
+    patchDom(root);
   });
 
   root.querySelector<HTMLSelectElement>('[data-s9-radio-preset]')?.addEventListener('change', (event) => {
     const select = event.currentTarget as HTMLSelectElement | null;
     if (!select) return;
-    const presetId = select.value as Signal9PresetTrackId;
-    const instrumentRoot = document.querySelector<HTMLElement>('[data-s9-instrument-layer]');
-    if (!instrumentRoot) return;
-    void applySignal9Preset(instrumentRoot, presetId).then(() => {
-      broadcastGameState.patch({
-        currentTrack: presetId,
-        currentMood: presetId === 'interference' ? 'unstable' : presetId === 'jammer' ? 'hostile' : presetId === 'uplink' ? 'focused' : 'tense',
-        broadcastStatus: getSignal9Mp3Adapter()?.getStatus().playing ? 'live' : 'standby',
-        systemMessage: `Radio preset loaded: ${activeTrackLabel(presetId)}`,
-      });
-    });
+    void loadDeckTrack(root, getDeckTrack(select.value), true);
   });
 
   root.querySelector<HTMLSelectElement>('[data-s9-radio-source-select]')?.addEventListener('change', (event) => {
@@ -470,6 +620,14 @@ function bindDeckControls(root: HTMLElement): void {
     getSignal9Mp3Adapter()?.setVolume(value / 100);
     root.querySelector<HTMLElement>('[data-s9-radio-volume]')!.textContent = String(value);
   });
+
+  root.querySelector<HTMLInputElement>('[data-s9-radio-seek]')?.addEventListener('input', (event) => {
+    const input = event.currentTarget as HTMLInputElement | null;
+    const snapshot = getSignal9Mp3Adapter()?.getPlaybackSnapshot();
+    if (!input || !snapshot || snapshot.duration <= 0) return;
+    getSignal9Mp3Adapter()?.seekTo((Number(input.value) / 1000) * snapshot.duration);
+    patchDom(root);
+  });
 }
 
 function updateLiveTelemetry(root: HTMLElement): void {
@@ -477,27 +635,52 @@ function updateLiveTelemetry(root: HTMLElement): void {
   const visual = getSignal9VisualAdapter();
   const state = broadcastGameState.getState();
   const snapshot = adapter?.getPlaybackSnapshot();
-  const features = adapter?.getAudioFeatures();
-  const status = adapter?.getStatus();
+  const analysis = adapter?.getAudioAnalysis();
+  const deckTrack = getDeckTrack(activeDeckTrackId);
   const visualStatus = visual?.getStatus();
-  const amplitude = features?.amplitude ?? 0;
-  const bass = features?.bass ?? 0;
-  const mids = features?.mids ?? 0;
-  const highs = features?.highs ?? 0;
-  const transient = features?.transient ?? 0;
+  const amplitude = analysis?.amplitude ?? 0;
+  const bass = analysis?.bass ?? 0;
+  const mids = analysis?.mids ?? 0;
+  const highs = analysis?.highs ?? 0;
+  const transient = analysis?.transient ?? 0;
   const phase = Date.now() / 1000;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const progress = snapshot && snapshot.duration > 0 ? Math.min(100, (snapshot.currentTime / snapshot.duration) * 100) : 0;
-  const signal = Math.round(58 + amplitude * 28 + bass * 14);
+  const signal = Math.round((analysis?.signalStrength ?? Math.min(1, 0.58 + amplitude * 0.28 + bass * 0.14)) * 99);
+  const quality = Math.round((analysis?.transmissionQuality ?? 0) * 99);
+  const peak = Math.round((analysis?.peak ?? 0) * 99);
+  const rms = Math.round((analysis?.rms ?? 0) * 99);
   const cpu = Math.round(14 + amplitude * 18 + transient * 11);
   const fps = Math.round(visualStatus?.fps ?? 60);
 
-  root.querySelector<HTMLElement>('[data-s9-radio-state]')!.textContent = status?.playing ? 'ON AIR' : 'STANDBY';
-  root.querySelector<HTMLButtonElement>('[data-s9-deck="play"]')!.textContent = status?.playing ? 'STOP' : 'PLAY';
-  root.querySelector<HTMLButtonElement>('[data-s9-deck="play"]')!.setAttribute('aria-pressed', status?.playing ? 'true' : 'false');
+  root.querySelector<HTMLElement>('[data-s9-stat="track"]')!.textContent = `TRK ${deckTrack.track}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="source"]')!.textContent = `SRC ${sourceLabel(radioSource)}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="elapsed"]')!.textContent = `EL ${formatTime(snapshot?.currentTime ?? 0)}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="remaining"]')!.textContent = `REM ${formatRemaining(snapshot?.currentTime ?? 0, snapshot?.duration ?? 0)}`;
+  root.querySelector<HTMLElement>('[data-s9-stat="frequency"]')!.textContent = `FRQ ${isAmbientTrackId(activeDeckTrackId) ? '00.0' : frequencyForTrack(state.currentTrack)} FM`;
+  root.querySelector<HTMLElement>('[data-s9-stat="preset"]')!.textContent = `PRE ${isAmbientTrackId(activeDeckTrackId) ? 'AMBIENT' : state.currentTrack.toUpperCase()}`;
+  root.querySelector<HTMLElement>('[data-s9-radio-state]')!.textContent = snapshot?.playing ? 'ON AIR' : 'STANDBY';
+  root.querySelector<HTMLButtonElement>('[data-s9-deck="play"]')!.setAttribute('aria-pressed', snapshot?.playing ? 'true' : 'false');
+  root.querySelector<HTMLButtonElement>('[data-s9-deck="pause"]')!.setAttribute('aria-pressed', snapshot?.playing ? 'false' : 'true');
+  const muteButton = root.querySelector<HTMLButtonElement>('[data-s9-deck="mute"]')!;
+  muteButton.textContent = snapshot?.muted ? 'UNMUTE' : 'MUTE';
+  muteButton.setAttribute('aria-pressed', snapshot?.muted ? 'true' : 'false');
+  root.querySelector<HTMLElement>('[data-s9-deck-track]')!.textContent = deckTrack.track;
+  root.querySelector<HTMLElement>('[data-s9-album-art]')!.textContent = deckTrack.label;
   root.querySelector<HTMLElement>('[data-s9-radio-progress]')!.style.inlineSize = `${progress}%`;
+  root.querySelector<HTMLInputElement>('[data-s9-radio-seek]')!.value = String(Math.round(progress * 10));
   root.querySelector<HTMLElement>('[data-s9-radio-time]')!.textContent = formatTime(snapshot?.currentTime ?? 0);
   root.querySelector<HTMLElement>('[data-s9-radio-duration]')!.textContent = formatTime(snapshot?.duration ?? 0);
+  root.querySelector<HTMLElement>('[data-s9-radio-remaining]')!.textContent = formatRemaining(snapshot?.currentTime ?? 0, snapshot?.duration ?? 0);
+  root.querySelector<HTMLElement>('[data-s9-audio-peak]')!.textContent = String(peak);
+  root.querySelector<HTMLElement>('[data-s9-audio-rms]')!.textContent = String(rms);
+  root.querySelector<HTMLElement>('[data-s9-audio-quality]')!.textContent = String(quality);
+  root.querySelector<HTMLElement>('[data-s9-visual-threshold]')!.textContent = `THR ${String(Math.round(amplitude * 99)).padStart(2, '0')}`;
+  root.querySelector<HTMLElement>('[data-s9-visual-dither]')!.textContent = `DITH ${String(Math.round(highs * 99)).padStart(2, '0')}`;
+  root.querySelector<HTMLElement>('[data-s9-visual-motion]')!.textContent = `MOT ${String(Math.round(mids * 99)).padStart(2, '0')}`;
+  root.querySelector<HTMLElement>('[data-s9-visual-feedback]')!.textContent = `FDBK ${String(Math.round(bass * 99)).padStart(2, '0')}`;
+  root.querySelector<HTMLElement>('[data-s9-visual-glitch]')!.textContent = `GLT ${String(Math.round(transient * 99)).padStart(2, '0')}`;
+  root.querySelector<HTMLElement>('[data-s9-visual-brightness]')!.textContent = `BRT ${String(Math.round(highs * 99)).padStart(2, '0')}`;
   root.querySelector<HTMLElement>('[data-s9-hud-time]')!.textContent = new Date().toLocaleTimeString([], { hour12: false });
   root.querySelector<HTMLElement>('[data-s9-hud-signal]')!.textContent = `${Math.min(99, signal)}%`;
   root.querySelector<HTMLElement>('[data-s9-hud-cpu]')!.textContent = `${Math.min(99, cpu)}%`;
@@ -505,8 +688,31 @@ function updateLiveTelemetry(root: HTMLElement): void {
   root.querySelector<HTMLElement>('[data-s9-hud-echo]')!.textContent =
     state.discoveredCharacters.length > 0 ? 'LOCKED' : state.aiStatus === 'thinking' ? 'TRACE' : 'LISTENING';
 
-  updateAsciiWaveform(root, { amplitude, bass, mids, highs, transient, phase, reducedMotion });
-  updateAsciiSpectrum(root, { bass, mids, highs, transient, phase, reducedMotion });
+  updateAsciiWaveform(root, {
+    amplitude,
+    bass,
+    mids,
+    highs,
+    transient,
+    waveform: analysis?.waveform,
+    stereo: analysis?.stereo,
+    playing: snapshot?.playing,
+    transmissionQuality: analysis?.transmissionQuality,
+    phase,
+    reducedMotion,
+  });
+  updateAsciiSpectrum(root, {
+    bass,
+    mids,
+    highs,
+    transient,
+    peak: analysis?.peak,
+    rms: analysis?.rms,
+    signalStrength: analysis?.signalStrength,
+    frequencyBins: analysis?.frequencyBins,
+    phase,
+    reducedMotion,
+  });
   updateAsciiGlobe(root, {
     networkStatus: state.networkStatus,
     broadcastStatus: state.broadcastStatus,
@@ -522,11 +728,12 @@ function updateLiveTelemetry(root: HTMLElement): void {
   });
   updateAsciiTelemetryBars(root, {
     bars: [
-      { label: 'cpu', value: cpu / 100 },
+      { label: 'peak', value: peak / 99 },
+      { label: 'rms', value: rms / 99 },
+      { label: 'bass', value: bass },
+      { label: 'mid', value: mids },
+      { label: 'treb', value: highs },
       { label: 'fps', value: fps / 60 },
-      { label: 'mem', value: Math.min(1, state.unlockedLore.length / 9) },
-      { label: 'ai', value: state.aiStatus === 'thinking' ? 0.85 : state.aiStatus === 'error' ? 0.2 : 0.55 },
-      { label: 'tx', value: state.broadcastStatus === 'live' ? 0.96 : state.broadcastStatus === 'jamming' ? 0.35 : 0.5 },
     ],
   });
   updateAsciiSignalMeter(root, 'broadcast', {

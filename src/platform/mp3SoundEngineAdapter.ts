@@ -26,13 +26,31 @@ export interface Signal9Mp3SoundAdapter extends SoundEngineAdapter {
     duration: number;
     volume: number;
     playing: boolean;
+    muted: boolean;
   };
   setVolume(volume: number): void;
+  setMuted(muted: boolean): void;
+  seekTo(seconds: number): void;
+  getAudioAnalysis(): Signal9AudioAnalysisSnapshot;
 }
 
 interface AnalyzerState {
   previousLevel: number;
   previousRms: number;
+}
+
+export interface Signal9AudioAnalysisSnapshot extends AudioFeaturesSnapshot {
+  peak: number;
+  rms: number;
+  signalStrength: number;
+  transmissionQuality: number;
+  frequencyBins: number[];
+  waveform: number[];
+  stereo: {
+    left: number;
+    right: number;
+    balance: number;
+  };
 }
 
 function clamp01(value: number): number {
@@ -95,6 +113,106 @@ function analyzeBins(
   };
 }
 
+function downsampleFrequencyBins(frequencyData: Uint8Array, bandCount = 32): number[] {
+  const bins: number[] = [];
+  const step = Math.max(1, Math.floor(frequencyData.length / bandCount));
+  for (let band = 0; band < bandCount; band++) {
+    const start = band * step;
+    const end = Math.min(frequencyData.length, start + step);
+    let sum = 0;
+    for (let index = start; index < end; index++) {
+      sum += frequencyData[index] ?? 0;
+    }
+    bins.push(clamp01(sum / Math.max(1, end - start) / 255));
+  }
+  return bins;
+}
+
+function downsampleWaveform(timeData: Uint8Array, sampleCount = 64): number[] {
+  const samples: number[] = [];
+  const step = Math.max(1, Math.floor(timeData.length / sampleCount));
+  for (let sample = 0; sample < sampleCount; sample++) {
+    const index = Math.min(timeData.length - 1, sample * step);
+    samples.push(((timeData[index] ?? 128) - 128) / 128);
+  }
+  return samples;
+}
+
+function analyzeStereoFromWaveform(timeData: Uint8Array): Signal9AudioAnalysisSnapshot['stereo'] {
+  let leftSquares = 0;
+  let rightSquares = 0;
+  let leftCount = 0;
+  let rightCount = 0;
+
+  for (let index = 0; index < timeData.length; index++) {
+    const normalized = ((timeData[index] ?? 128) - 128) / 128;
+    if (index % 2 === 0) {
+      leftSquares += normalized * normalized;
+      leftCount += 1;
+    } else {
+      rightSquares += normalized * normalized;
+      rightCount += 1;
+    }
+  }
+
+  const left = clamp01(Math.sqrt(leftSquares / Math.max(1, leftCount)) * 2.2);
+  const right = clamp01(Math.sqrt(rightSquares / Math.max(1, rightCount)) * 2.2);
+  return {
+    left,
+    right,
+    balance: clamp01((right - left + 1) / 2),
+  };
+}
+
+function buildAnalysisSnapshot(
+  frequencyData: Uint8Array,
+  timeData: Uint8Array,
+  state: AnalyzerState,
+): Signal9AudioAnalysisSnapshot {
+  const features = analyzeBins(frequencyData, timeData, state);
+  let peak = 0;
+  let sumSquares = 0;
+
+  for (let index = 0; index < timeData.length; index++) {
+    const normalized = Math.abs(((timeData[index] ?? 128) - 128) / 128);
+    peak = Math.max(peak, normalized);
+    sumSquares += normalized * normalized;
+  }
+
+  const rms = clamp01(Math.sqrt(sumSquares / Math.max(1, timeData.length)) * 2.2);
+  const signalStrength = clamp01(features.amplitude * 0.55 + features.bass * 0.25 + features.mids * 0.12 + features.highs * 0.08);
+  const transmissionQuality = clamp01(0.52 + signalStrength * 0.42 - features.transient * 0.16);
+
+  return {
+    ...features,
+    peak: clamp01(peak * 1.8),
+    rms,
+    signalStrength,
+    transmissionQuality,
+    frequencyBins: downsampleFrequencyBins(frequencyData),
+    waveform: downsampleWaveform(timeData),
+    stereo: analyzeStereoFromWaveform(timeData),
+  };
+}
+
+function emptyAnalysisSnapshot(): Signal9AudioAnalysisSnapshot {
+  return {
+    amplitude: 0,
+    bass: 0,
+    mids: 0,
+    highs: 0,
+    transient: 0,
+    timestamp: Date.now(),
+    peak: 0,
+    rms: 0,
+    signalStrength: 0,
+    transmissionQuality: 0,
+    frequencyBins: Array.from({ length: 32 }, () => 0),
+    waveform: Array.from({ length: 64 }, () => 0),
+    stereo: { left: 0, right: 0, balance: 0.5 },
+  };
+}
+
 /**
  * Platform sound adapter that plays an MP3 and exposes analysis to the Audio Reactive Bridge.
  * No plantasia-sound-engine synth is started.
@@ -113,6 +231,7 @@ export function createMp3SoundEngineAdapter(
   let audioReady = false;
   let playing = false;
   let currentVolume = 1;
+  let currentMuted = false;
   let currentPresetId: string | null = 'transmission';
   let lastError: string | null = null;
   const parameterSnapshot: Record<string, number> = {
@@ -159,6 +278,7 @@ export function createMp3SoundEngineAdapter(
     audio.loop = true;
     audio.crossOrigin = 'anonymous';
     audio.volume = currentVolume;
+    audio.muted = currentMuted;
     mediaSource = audioContext.createMediaElementSource(audio);
     mediaSource.connect(analyser);
   };
@@ -243,6 +363,7 @@ export function createMp3SoundEngineAdapter(
         duration: Number.isFinite(audio?.duration) ? (audio?.duration ?? 0) : 0,
         volume: audio?.volume ?? 1,
         playing,
+        muted: audio?.muted ?? currentMuted,
       };
     },
 
@@ -253,6 +374,21 @@ export function createMp3SoundEngineAdapter(
         audio.volume = nextVolume;
       }
       emit('sound:parameter-change', { name: 'volume', value: nextVolume });
+    },
+
+    setMuted(nextMuted: boolean): void {
+      currentMuted = nextMuted;
+      if (audio) {
+        audio.muted = nextMuted;
+      }
+      emit('sound:parameter-change', { name: 'muted', value: nextMuted ? 1 : 0 });
+    },
+
+    seekTo(seconds: number): void {
+      if (!audio || !Number.isFinite(seconds)) return;
+      const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+      audio.currentTime = Math.min(Math.max(0, seconds), Math.max(0, duration));
+      emit('sound:parameter-change', { name: 'seek', value: audio.currentTime });
     },
 
     async loadTrack(src: string, autoplay = false): Promise<void> {
@@ -308,22 +444,24 @@ export function createMp3SoundEngineAdapter(
     },
 
     getAudioFeatures(): AudioFeaturesSnapshot {
-      if (!analyser || !playing) {
-        return {
-          amplitude: 0,
-          bass: 0,
-          mids: 0,
-          highs: 0,
-          transient: 0,
-          timestamp: Date.now(),
-        };
-      }
+      const analysis = adapter.getAudioAnalysis();
+      return {
+        amplitude: analysis.amplitude,
+        bass: analysis.bass,
+        mids: analysis.mids,
+        highs: analysis.highs,
+        transient: analysis.transient,
+        timestamp: analysis.timestamp,
+      };
+    },
 
+    getAudioAnalysis(): Signal9AudioAnalysisSnapshot {
+      if (!analyser || !playing) return emptyAnalysisSnapshot();
       const freq = new Uint8Array(analyser.frequencyBinCount);
       const time = new Uint8Array(analyser.fftSize);
       analyser.getByteFrequencyData(freq);
       analyser.getByteTimeDomainData(time);
-      return analyzeBins(freq, time, analyzerState);
+      return buildAnalysisSnapshot(freq, time, analyzerState);
     },
 
     getParameterSnapshot(): Readonly<Record<string, number>> {

@@ -57,6 +57,33 @@ export const SIGNAL_9_VIDEO_SOURCES: Signal9VideoSource[] = [
     loop: true,
     muted: true,
   },
+  {
+    id: 'organic-vs-synthetic-1',
+    title: 'Organic vs Synthetic I',
+    src: '/assets/video/organic-vs-synthetic-1.mp4',
+    description: 'Human imperfection defeating the optimization grid — alternate Uplink resistance loop.',
+    defaultPreset: 'uplink',
+    loop: true,
+    muted: true,
+  },
+  {
+    id: 'organic-vs-synthetic-2',
+    title: 'Organic vs Synthetic II',
+    src: '/assets/video/organic-vs-synthetic-2.mp4',
+    description: 'Human imperfection defeating the optimization grid — alternate Broadcast carrier loop.',
+    defaultPreset: 'broadcast',
+    loop: true,
+    muted: true,
+  },
+  {
+    id: 'corporate-chorus',
+    title: 'Corporate Chorus',
+    src: '/assets/video/corporate-chorus.mp4',
+    description: 'The collective consciousness of Project Digital Harmony — alternate Jammer hostile loop.',
+    defaultPreset: 'jammer',
+    loop: true,
+    muted: true,
+  },
 ];
 
 export const SIGNAL_9_DEFAULT_VIDEO_SOURCE = SIGNAL_9_VIDEO_SOURCES[0];

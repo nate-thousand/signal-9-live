@@ -1,4 +1,4 @@
-import { SIGNAL_9_PRESET_TRACK_LIST } from '../audio/transmissionTracks.js';
+import { SIGNAL_9_AMBIENT_TRACKS, SIGNAL_9_PRESET_TRACK_LIST } from '../audio/transmissionTracks.js';
 import { SIGNAL_9_VIDEO_SOURCES } from '../config/videoSources.js';
 import { SIGNAL_9_PRESET_BUNDLES } from '../content/presetBundles.js';
 
@@ -93,6 +93,24 @@ function songAssets(): SongAsset[] {
       bpm: bundle?.ui?.tempo,
     };
   });
+}
+
+/** Standalone ambient tapes — discoverable audio fragments outside the four carrier presets */
+function ambientSongAssets(): SongAsset[] {
+  return SIGNAL_9_AMBIENT_TRACKS.map((entry) => ({
+    kind: 'song',
+    id: entry.id,
+    title: entry.label,
+    description: `${entry.track} — recovered ambient tape fragment.`,
+    tags: ['signal-9', 'audio', 'ambient', 'tape'],
+    mood: 'recovered',
+    location: 'Unknown Archive',
+    faction: 'Signal 9',
+    mission: 'memory-recovery',
+    relatedAssets: [],
+    filePath: entry.src,
+    presetId: entry.id,
+  }));
 }
 
 function videoAssets(): VideoAsset[] {
@@ -275,7 +293,7 @@ const LORE_ASSETS: LoreAsset[] = [
 ];
 
 export const SIGNAL_9_ASSET_MANIFEST: Signal9AssetManifest = {
-  songs: songAssets(),
+  songs: [...songAssets(), ...ambientSongAssets()],
   videos: videoAssets(),
   images: PLACEHOLDER_IMAGES,
   characters: CHARACTER_ASSETS,

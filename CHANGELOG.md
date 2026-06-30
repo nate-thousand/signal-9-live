@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Signal 9 Radio HUD Integration
+
+- Added live FFT, waveform, peak, RMS, signal strength, transmission quality, stereo balance, and downsampled analyzer data from the MP3 adapter for HUD use.
+- Upgraded the Broadcast Deck with play, pause, previous, next, restart, seek, volume, mute, source, current track, timing, and diagnostic readouts without changing the audio engine or Platform code.
+- Connected the left waveform, right spectrum analyzer, system monitor bars, center visual telemetry, status bar, and packet meters to the currently playing soundtrack.
+- Added four recovered ambient tape assets to the radio deck and asset manifest, plus three alternate video ASCII source loops in the VIDEO ASCII source list.
+- Preserved the panel-scoped Visual Engine mount; no full-screen ASCII background was reintroduced.
+
 ### ASCII Engine Scoped To HUD Panels
 
 - Stopped the Plantasonic ASCII Visual Engine canvas from rendering as a full-viewport background behind the Home HUD.

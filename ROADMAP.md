@@ -142,7 +142,7 @@ Reframe the transmission player as the **Signal 9 Radio** — preset-bound sound
 
 ### Description
 
-Mission audio uses local MP3 files analyzed via Web Audio (`mp3SoundEngineAdapter.ts`). The plantasia sound-engine synth is intentionally not started during missions. Each preset bundle pairs a track, bridge sensitivity, and video ASCII profile. AI responses can switch presets via `applySignal9Preset()`.
+Mission audio uses local MP3 files analyzed via Web Audio (`mp3SoundEngineAdapter.ts`). The plantasia sound-engine synth is intentionally not started during missions. Each preset bundle pairs a track, bridge sensitivity, and video ASCII profile. AI responses can switch presets via `applySignal9Preset()`. The Broadcast Deck is now the HUD heartbeat: its live analyzer snapshots feed the waveform, FFT spectrum, system monitor, status bar, packet activity, and scoped center ASCII engine telemetry.
 
 ### Deliverables
 
@@ -150,16 +150,19 @@ Mission audio uses local MP3 files analyzed via Web Audio (`mp3SoundEngineAdapte
 |-------------|--------|----------|
 | Four preset MP3 tracks | ✅ | `public/assets/audio/`, `transmissionTracks.ts` |
 | MP3 sound adapter + Web Audio analysis | ✅ | `mp3SoundEngineAdapter.ts` |
+| Live analyzer snapshot (FFT, waveform, peak, RMS, quality) | ✅ | `mp3SoundEngineAdapter.ts` |
+| Ambient tape deck assets | ✅ | `SIGNAL_9_AMBIENT_TRACKS`, `public/assets/audio/` |
 | Audio Reactive Bridge integration | ✅ | `signal9AudioReactive.ts`, `presetBundles.ts` |
 | Signal 9 Radio panel | ✅ | `mountBroadcastTerminal.ts` |
-| Waveform / spectrum / progress / volume UI | ✅ | `mountBroadcastTerminal.ts`, `mp3SoundEngineAdapter.ts` |
+| Full Broadcast Deck (play/pause/prev/next/seek/volume/mute) | ✅ | `mountBroadcastTerminal.ts`, `mp3SoundEngineAdapter.ts` |
+| Waveform / FFT spectrum / progress / volume UI | ✅ | `mountBroadcastTerminal.ts`, `src/ui/hudVisuals/` |
 | Full deck in MENU (presets + transport) | ✅ | `TransmissionControls.ts`, `ControlMenu.ts` |
 | AI-driven track switching | ✅ | `applyBroadcastResponse.ts` |
 | Preset theme + bridge on switch | ✅ | `applySignal9Preset.ts` |
 | Bass-reactive glyph scale pulse | ✅ | `bassEmojiPulse.ts` |
 | Blackout video-only preset (no dedicated MP3) | ✅ | Documented intentional behavior |
 | `startup.mp3` on disk | 🚧 | Present but not wired in code |
-| Playlist / queue support | ⬜ | — |
+| Playlist / queue support | 🚧 | Deck can step carrier presets + ambient tapes; no persisted queue |
 | Crossfade between tracks | ⬜ | — |
 | Mixcloud integration | 🚧 | Source selector exists; ingest/auth pending |
 | SoundCloud integration | 🚧 | Source selector exists; ingest/auth pending |
@@ -303,18 +306,19 @@ The Platform ASCII Visual Engine canvas no longer renders as a full-viewport bac
 |-------------|--------|----------|
 | Home Terminal HUD layout | ✅ | `mountBroadcastTerminal.ts` |
 | Terminal screen layer mode | ✅ | `AppShell`, `app-layout.scss` |
-| Header status bar (SIGNAL 9, location, mission, NET, TX) | ✅ | Home Terminal |
+| Header status bar (track, source, elapsed, remaining, TX, frequency, preset, visual mode) | ✅ | Home Terminal |
 | Command terminal + chat history | ✅ | Left panel |
 | Three dynamic AI choice buttons | ✅ | Left panel |
 | Center ASCII Visual Engine frame | ✅ | Scoped to panel — `scopedVisualStage.ts` |
 | Signal 9 Radio panel | ✅ | Right panel |
 | Embedded ASCII HUD visual modules | ✅ | `src/ui/hudVisuals/` |
-| Latest transmission waveform | ✅ | Chat + radio panels |
-| Radio spectrum equalizer | ✅ | Radio panel |
+| Latest transmission waveform | ✅ | Chat + radio panels — live analyzer waveform/stereo |
+| Radio spectrum analyzer | ✅ | Radio panel — live FFT bars + peaks |
 | Echo portrait / network map / globe | ✅ | Right and center HUD panels |
 | Footer packet activity meter | ✅ | Bottom HUD |
 | Mission / Memory / Echo panels | ✅ | Right panel |
 | Bottom HUD telemetry | ✅ | Frequency, signal, Echo, memory, TX, CPU, FPS, mission, district, time |
+| Live audio diagnostics in HUD | ✅ | Peak, RMS, bass, mid, treble, signal, quality |
 | Responsive console (mobile collapse) | ✅ | `broadcast-terminal.scss` |
 | Terminal primitives (boot lines, prompts) | ✅ | `src/ui/terminal.ts` |
 | Control Menu (collapsible) | ✅ | `ControlMenu.ts` |
@@ -399,7 +403,7 @@ The ASCII stage must breathe with the broadcast — reacting to music, AI state 
 
 ### Description
 
-Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, which modulates engine parameters (density, motion, brightness, glitch). The Home HUD also embeds lightweight ASCII instruments fed by the same analyzer, playback state, game state, mission state, Echo state, network status, and derived packet activity. Bass drives glyph scale pulses. AI responses switch video sources, ASCII profiles, and preset themes. Slider controls map through `transmissionControlState.ts` with tuned 25%–75% threshold bands.
+Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, which modulates engine parameters (density, motion, brightness, glitch). The Home HUD also embeds lightweight ASCII instruments fed by the same analyzer, playback state, game state, mission state, Echo state, network status, FFT bins, waveform samples, peak/RMS, stereo balance, signal strength, and derived packet activity. Bass drives glyph scale pulses. AI responses switch video sources, ASCII profiles, and preset themes. Slider controls map through `transmissionControlState.ts` with tuned 25%–75% threshold bands.
 
 ### Deliverables
 
@@ -416,6 +420,7 @@ Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, wh
 | Video post passes (threshold, feedback, scanlines, glitch) | ✅ | Engine + adapter |
 | Background image blend on AI signal | ✅ | `[data-s9-bg-image]` overlay |
 | HUD waveform / spectrum / packet instruments | ✅ | `src/ui/hudVisuals/`, `mountBroadcastTerminal.ts` |
+| Live FFT bars, peak indicators, and waveform samples | ✅ | `mp3SoundEngineAdapter.ts`, `AsciiSpectrum.ts`, `AsciiWaveform.ts` |
 | Echo portrait / network pulse / globe telemetry | ✅ | Derived from game + network + AI state |
 | ASCII engine scoped to HUD panels (no full-screen background) | ✅ | `src/platform/scopedVisualStage.ts` |
 | ASCII reacts to explicit gameplay events | 🚧 | Only via AI preset changes |
