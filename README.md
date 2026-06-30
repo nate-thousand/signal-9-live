@@ -37,25 +37,44 @@ Underground resistance broadcast experience built on [Plantasonic Platform](http
 | Game state persistence | **Live** — `localStorage` (`signal9-broadcast-state-v1`) |
 | Structured AI JSON | **Live** — track, video, lore, choices drive UI |
 | GIF export UI | **Not built** — engine-ready; see ROADMAP Phase 9 |
-| Production AI API | **Not built** — dev/preview middleware only |
+| Production AI API | **Live** — Vercel serverless function, same code path as dev |
 
-### Quick start (AI)
+### AI setup (local + Vercel)
+
+GHOST runs in one of two modes, chosen automatically by whether `OPENAI_API_KEY` is set — no code changes needed either way:
+
+| Mode | When | Behavior |
+|------|------|----------|
+| **Stub Mode** | `OPENAI_API_KEY` unset | Offline scripted responder (`server/broadcastChat.ts`) — fully playable, no network calls |
+| **Live Mode** | `OPENAI_API_KEY` set | Real OpenAI chat completions via GHOST's system prompt + structured JSON schema |
+
+On startup the server logs one line (never the key itself):
+
+```
+[signal-9] ✓ OpenAI configured — GHOST narration is live
+[signal-9] ⚠ Running in Stub Mode — set OPENAI_API_KEY for live narration
+```
+
+**Local development:**
 
 ```bash
-cp .env.example .env
-# Add OPENAI_API_KEY — optional; stub AI works without it
+cp .env.example .env.local
+# Edit .env.local and paste your real OPENAI_API_KEY — never commit this file
 npm run dev
 ```
 
-Dev server exposes `POST /api/broadcast/chat` (Vite middleware). Production static builds need a matching API host for live AI — see ROADMAP Phase 4.
+`.env.local` (and `.env`, `.env.*`) are gitignored. The dev server mounts `POST /api/broadcast/chat` via a Vite plugin (`vite.config.ts`) reading `process.env`/`.env.local` through Vite's `loadEnv`.
+
+**Vercel deployment:**
+
+`api/broadcast/chat.ts` is a serverless Function that calls the exact same `handleBroadcastChat` handler as the dev server. Set the variable once in **Project Settings → Environment Variables → `OPENAI_API_KEY`** (Production/Preview/Development as needed) — no code or routing changes required. Without it set, the deployed app automatically serves Stub Mode instead of erroring.
 
 ### Next milestones
 
-1. Production AI API (serverless route for `dist/`)
-2. Rich lore panel (render full transmission body)
-3. GIF export UI (wire engine APIs to Menu)
-4. Branding cleanup (legacy "Beat Runner" labels)
-5. Mission completion / debrief flow
+1. Rich lore panel (render full transmission body)
+2. GIF export UI (wire engine APIs to Menu)
+3. Branding cleanup (legacy "Beat Runner" labels)
+4. Mission completion / debrief flow
 
 ## Experience flow
 
@@ -161,7 +180,9 @@ Follows the Plantasonic **thin app** model:
 | **Game state** | `src/game/` (`BroadcastGameState`, `broadcastGameState` store) |
 | **Asset manifest** | `src/assets/manifest.ts` |
 | **AI layer** | `src/ai/` (`chatClient`, `applyBroadcastResponse`, `broadcastResponse`) |
-| **Chat API (dev)** | `server/broadcastChat.ts` → `/api/broadcast/chat` |
+| **Chat API handler** | `server/broadcastChat.ts` → `/api/broadcast/chat` |
+| **Chat API (dev/preview)** | Vite plugin in `vite.config.ts` mounts the handler as middleware |
+| **Chat API (Vercel)** | `api/broadcast/chat.ts` — serverless Function wrapping the same handler |
 | Stub briefing/debrief | `src/ai/stub/` |
 
 ### Visual rendering (sole renderer)

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Live OpenAI Backend For Local Dev And Vercel
+
+- Fixed a bug where `/api/broadcast/chat` returned 404 on the dev/preview server: `configureServer`/`configurePreviewServer` were defined as plain properties on the Vite config object, but those are **plugin hooks** and were silently ignored by Vite. Moved them into a real `broadcastChatApiPlugin` registered via `plugins: []` in `vite.config.ts` — the chat endpoint now actually mounts locally.
+- Added `api/broadcast/chat.ts`, a Vercel serverless Function that calls the same `handleBroadcastChat` handler used by the dev server, so production deployments get a working `/api/broadcast/chat` route for the first time (previously the static build had no backend at all for this path).
+- Added `logAiBackendStatus()` to `server/broadcastChat.ts`: logs `✓ OpenAI configured` or `⚠ Running in Stub Mode` on dev/preview server start and on each Vercel cold start — never logs the key itself.
+- Updated `.env.example`, `README.md` with local (`.env.local`) and Vercel (Project Settings → Environment Variables) setup instructions for `OPENAI_API_KEY`; confirmed `.gitignore` already excludes `.env`, `.env.local`, and `.env.*` (with an explicit `.env.example` exception).
+- No gameplay, UI, engine, or audio behavior changed; `OPENAI_API_KEY` remains the only required variable name, identical locally and on Vercel.
+
 ### Broadcast Terminal Global ASCII Background Removed
 
 - Removed the Broadcast Terminal's active scoped-stage binding and deleted the temporary `scopedVisualStage.ts` implementation.

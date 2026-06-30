@@ -1,9 +1,9 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 
-import { handleBroadcastChat } from './server/broadcastChat.js';
+import { handleBroadcastChat, logAiBackendStatus } from './server/broadcastChat.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const platformRoot = path.resolve(__dirname, '../plantasonic-platform');
@@ -21,6 +21,26 @@ function mountBroadcastChatApi(
     }
     void handleBroadcastChat(req, res, apiKey);
   });
+}
+
+/**
+ * `configureServer` / `configurePreviewServer` are Vite **plugin** hooks —
+ * they are not read when placed directly on the returned UserConfig object,
+ * so the broadcast chat middleware must be registered through a real plugin
+ * for the dev/preview server to ever mount `/api/broadcast/chat`.
+ */
+function broadcastChatApiPlugin(apiKey?: string): Plugin {
+  return {
+    name: 'signal-9-broadcast-chat-api',
+    configureServer(server) {
+      mountBroadcastChatApi(server.middlewares, apiKey);
+      logAiBackendStatus(apiKey);
+    },
+    configurePreviewServer(server) {
+      mountBroadcastChatApi(server.middlewares, apiKey);
+      logAiBackendStatus(apiKey);
+    },
+  };
 }
 
 export default defineConfig(({ mode }) => {
@@ -64,12 +84,7 @@ export default defineConfig(({ mode }) => {
     port: 5177,
     open: true,
   },
-  configureServer(server) {
-    mountBroadcastChatApi(server.middlewares, env.OPENAI_API_KEY);
-  },
-  configurePreviewServer(server) {
-    mountBroadcastChatApi(server.middlewares, env.OPENAI_API_KEY);
-  },
+  plugins: [broadcastChatApiPlugin(env.OPENAI_API_KEY)],
   build: {
     outDir: 'dist',
     emptyOutDir: true,

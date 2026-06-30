@@ -27,6 +27,19 @@ Rules:
 - Keep narration terse, atmospheric, second-person, terminal voice
 - Gradually unlock lore and characters as the player progresses`;
 
+/**
+ * Reports whether GHOST is backed by the live OpenAI API or the offline stub,
+ * without ever printing the key itself. Safe to call from dev/preview server
+ * startup and from serverless cold starts.
+ */
+export function logAiBackendStatus(apiKey?: string): void {
+  if (apiKey) {
+    console.log('[signal-9] ✓ OpenAI configured — GHOST narration is live');
+  } else {
+    console.log('[signal-9] ⚠ Running in Stub Mode — set OPENAI_API_KEY for live narration');
+  }
+}
+
 function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
