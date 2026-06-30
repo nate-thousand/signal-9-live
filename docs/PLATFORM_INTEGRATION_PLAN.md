@@ -15,7 +15,7 @@ Signal 9 is a standalone Vite + TypeScript application with product-specific sta
 | Platform integration layer | `src/platform/` | Local shims around Platform SDK, demo wiring, MP3 audio, video-to-ASCII, and transmission state. |
 | Product content | `src/content/`, `src/config/`, `src/appContent.ts` | Presets, shell config, plugins, mappings, video sources, and product metadata. |
 | Broadcast Terminal UI | `src/ui/`, `src/navigation/screens/` | Product interface, chat, deck, lore panel, choices, control menu, and video controls. |
-| AI and game state | `src/ai/`, `src/game/`, `server/` | Product-specific chat contract, local game state, Vite middleware, and stub/live AI. |
+| AI and game state | `src/ai/`, `src/game/`, `server/` | Product-specific chat contract, local game state, Vite middleware, and stub/live AI. Game loop contract: `docs/CHAT_GAME_LOOP.md`. |
 | Assets | `public/assets/`, `src/assets/manifest.ts`, `src/audio/` | Product media and manifest context for AI responses. |
 | Theme layer | `src/styles/`, `src/theme/` | Signal 9 semantic tokens, preset themes, startup styling, and terminal layout. |
 | Planned export work | `src/export/` | Empty today; `EXPORT_GUIDE.md` describes the target state. |
@@ -27,7 +27,7 @@ Signal 9 is a standalone Vite + TypeScript application with product-specific sta
 - Product identity: broadcast resistance narrative, GHOST voice, copy, lore, characters, missions, and terminal tone.
 - Startup sequence: loading screen, title screen, ASCII logo, startup audio fade, and begin-transmission flow.
 - Application navigation: `AppShell`, route/screen IDs, Broadcast Terminal overlays, and mission/debrief screens.
-- Product content: preset bundles, video sources, asset manifest, game state, AI response schema, and prompt context.
+- Product content: preset bundles, video sources, asset manifest, game state, AI response schema, game loop contract (`docs/CHAT_GAME_LOOP.md`), and prompt context.
 - App-specific theme: `--s9-*` semantic tokens, preset theme overrides, terminal atmosphere, and Signal 9 layout/motion.
 - Mission audio behavior: MP3 transmission tracks, Web Audio analysis, and the app decision to bypass synth playback during missions.
 - Video-to-ASCII creative direction: source selection, preset profiles, transmission controls, and AI-driven visual source changes.

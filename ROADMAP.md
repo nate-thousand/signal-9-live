@@ -30,12 +30,14 @@ After **Cold boot → Signal authentication → Press ENTER**, the player enters
 
 ### Immediate next milestones
 
-1. **Production AI API** — serverless route for static `dist/` deployments
-2. **Plantasonic Platform Integration implementation prep** — review the import map and approve the future Platform/App Kit mount API before runtime import changes
-3. **External radio ingest** — connect Mixcloud, SoundCloud, and streaming radio modes beyond prototype source selection
-4. **Rich lore panel** — render full transmission body text, not just titles
-5. **GIF export UI** — wire engine export APIs to Menu panel (documented but not built)
-6. **Mission completion flow** — wire debrief or remove dead navigation paths
+1. **ChatGPT Game Loop Contract** — ✅ documented in `docs/CHAT_GAME_LOOP.md`; **ready for implementation** (local scripted loop first, then ChatGPT)
+2. **Local scripted game loop** — fixed mission script with client-side d20 rolls before full ChatGPT connection
+3. **Production AI API** — serverless route for static `dist/` deployments
+4. **Plantasonic Platform Integration implementation prep** — review the import map and approve the future Platform/App Kit mount API before runtime import changes
+5. **External radio ingest** — connect Mixcloud, SoundCloud, and streaming radio modes beyond prototype source selection
+6. **Rich lore panel** — render full transmission body text, not just titles
+7. **GIF export UI** — wire engine export APIs to Menu panel (documented but not built)
+8. **Mission completion flow** — wire debrief or remove dead navigation paths
 
 ---
 
@@ -212,11 +214,16 @@ The player explores the resistance grid entirely through the command terminal. A
 | Voice input | ⬜ | — |
 | TTS narration | ⬜ | — |
 | Stub briefing/debrief generators | 🚧 | `src/ai/stub/` — exist but UI bypassed |
+| ChatGPT game loop contract | ✅ | `docs/CHAT_GAME_LOOP.md` — ready for implementation |
+| Local scripted loop (pre-ChatGPT) | ⬜ | First implementation step after contract |
+| Roll request / result schema | ⬜ | Defined in contract; not in runtime schema yet |
+| Mission update / rewards / world patches | ⬜ | Defined in contract; not in runtime schema yet |
 
 ### Dependencies
 
 - Phase 1, Phase 3, Phase 7 (manifest IDs)
 - `.env` with `OPENAI_API_KEY` for live AI
+- `docs/CHAT_GAME_LOOP.md` for loop phases, rolls, and extended response shape
 
 ### Future expansion
 
@@ -260,11 +267,13 @@ Build the narrative game layer on top of chat — locations, characters, lore, f
 | Scoring / grades | ⬜ | Stub debrief exists |
 | Multiple save slots | ⬜ | Single `localStorage` key |
 | Save export / import | ⬜ | — |
+| Chat game loop (scripted → ChatGPT) | 🚧 | Contract ✅ `docs/CHAT_GAME_LOOP.md`; implementation ⬜ |
 
 ### Dependencies
 
 - Phase 4 (AI generates and unlocks content)
 - Phase 7 (manifest defines world entities)
+- `docs/CHAT_GAME_LOOP.md` (official loop, rolls, GHOST roles, response extensions)
 
 ### Future expansion
 

@@ -1,6 +1,10 @@
 import type { Signal9PresetTrackId } from '../audio/transmissionTracks.js';
 
-/** Structured AI broadcast response — drives the entire terminal interface */
+/**
+ * Structured AI broadcast response — drives the entire terminal interface.
+ * v0.1 live fields only. Extended loop contract (rolls, missionUpdate, rewards,
+ * worldStateChanges, echoUpdate): see docs/CHAT_GAME_LOOP.md
+ */
 export interface AiBroadcastResponse {
   narration: string;
   location: string;

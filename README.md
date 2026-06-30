@@ -204,6 +204,8 @@ Mobile collapses the equipment bays while preserving chat, visuals, radio contro
 
 ### AI architecture
 
+Official gameplay loop contract: [`docs/CHAT_GAME_LOOP.md`](docs/CHAT_GAME_LOOP.md) (mission → explore → choices → roll → consequences → rewards → world evolves → next mission).
+
 ```
 Player input / AI choice
   → POST /api/broadcast/chat (structured JSON schema)
@@ -215,6 +217,8 @@ Player input / AI choice
        └─ background image overlay
   → Terminal UI subscribers re-render panels
 ```
+
+Extended loop fields (rolls, mission updates, rewards, world patches) are specified in `docs/CHAT_GAME_LOOP.md` and not yet in the runtime schema.
 
 ### Game state model (`BroadcastGameState`)
 

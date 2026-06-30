@@ -33,7 +33,10 @@ export interface InventoryItem {
   quantity: number;
 }
 
-/** Typed broadcast game state — single source of truth for the terminal */
+/**
+ * Typed broadcast game state — single source of truth for the terminal.
+ * Loop phases, attributes, skills, roll state, and mission flags: docs/CHAT_GAME_LOOP.md
+ */
 export interface BroadcastGameState {
   currentLocation: string;
   currentMission: string;
