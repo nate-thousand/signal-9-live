@@ -302,6 +302,10 @@ The Broadcast Terminal is the primary post-entry UI: status bar, deck, transpare
 | Control Menu (collapsible) | ✅ | `ControlMenu.ts` |
 | VIDEO ASCII panel | ✅ | `VideoTransmissionControls.ts` |
 | Transmission debug overlay (`?debug`) | ✅ | `transmissionDebugOverlay.ts` |
+| Official Signal 9 design language | ✅ | `docs/VISUAL_LANGUAGE.md` |
+| Art direction doctrine | ✅ | `docs/ART_DIRECTION.md` |
+| UI principles | ✅ | `docs/UI_PRINCIPLES.md` |
+| v0 / Figma design guidelines | ✅ | `docs/V0_DESIGN_GUIDELINES.md` |
 | Radio interface | ⬜ | — |
 | Transmission browser | ⬜ | — |
 | ASCII progress bars | ⬜ | — |
@@ -633,6 +637,10 @@ See `src/ai/broadcastResponse.ts`. Fields map to game state and engine hooks in 
 |----------|---------|
 | [README.md](README.md) | Setup, architecture overview, theme tokens |
 | [ROADMAP.md](ROADMAP.md) | **This file** — development phases and status |
+| [docs/VISUAL_LANGUAGE.md](docs/VISUAL_LANGUAGE.md) | Official Signal 9 visual operating philosophy |
+| [docs/ART_DIRECTION.md](docs/ART_DIRECTION.md) | Art direction and reference language |
+| [docs/UI_PRINCIPLES.md](docs/UI_PRINCIPLES.md) | Screen, component, panel, interaction, and interface rules |
+| [docs/V0_DESIGN_GUIDELINES.md](docs/V0_DESIGN_GUIDELINES.md) | v0 prompt templates and Figma guidance |
 | [EXPORT_GUIDE.md](EXPORT_GUIDE.md) | Aspirational export docs (UI not implemented) |
 | [public/assets/video/README.md](public/assets/video/README.md) | Video asset mapping |
 | [.env.example](.env.example) | OpenAI configuration |

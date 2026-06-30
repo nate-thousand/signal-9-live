@@ -247,6 +247,21 @@ Each asset includes: `id`, `title`, `description`, `tags`, `mood`, `location`, `
 
 Preset-specific sensitivity and base `visualParameters` live in `src/content/presetBundles.ts` and `src/content/visualPresets.ts`.
 
+## Signal 9 design language
+
+Signal 9 is the operating system of The Resistance. The player is not using an app; the player is operating an illegal analog communications network inside a world controlled by Project Digital Harmony.
+
+The official design language is documentation-only and does not redesign the current application. Future screens, components, motion, Figma files, and v0 prompts should follow `docs/VISUAL_LANGUAGE.md`, `docs/ART_DIRECTION.md`, `docs/UI_PRINCIPLES.md`, and `docs/V0_DESIGN_GUIDELINES.md`.
+
+Core doctrine:
+
+- Music is civilization.
+- Memory is resistance.
+- Analog systems preserve individuality.
+- Digital systems optimize conformity.
+
+Every panel should feel like equipment instead of software. Every animation should represent signal behavior instead of decorative motion.
+
 ## Signal 9 theme
 
 Signal 9 applies an **application-level semantic theme** on top of the shared Plantasonic Design System. The DS, Platform, Sound Engine, and Visual Engine are **not** modified.

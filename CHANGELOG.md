@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Signal 9 Design Language
+
+- Added the official documentation-only Signal 9 visual operating philosophy in `docs/VISUAL_LANGUAGE.md`.
+- Added supporting art direction, UI principles, and v0/Figma guidelines for future screens, prompts, and design work.
+- Updated README and ROADMAP references without modifying application code, engines, runtime behavior, content, assets, soundtrack, lore, or app concept.
+
 ### Plantasonic Platform Integration
 
 - Added explicit local dependencies for `@plantasonic/platform` and `@plantasonic/platform-types` so Signal 9 consumes the frozen Platform SDK and shared contracts as product-app dependencies.
