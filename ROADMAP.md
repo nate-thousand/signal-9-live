@@ -22,7 +22,7 @@ Signal 9 is an **AI-first interactive cyberpunk broadcast terminal** built on th
 | 8 | Visual Reactivity | ✅ Complete | ~85% |
 | 9 | Content Creation Tools | ⬜ Planned | ~0% |
 | 10 | Signal 9 Platform | ⬜ Planned | ~15% |
-| 11 | Plantasonic Platform Integration | 🚧 Planning | ~20% |
+| 11 | Plantasonic Platform Integration | 🚧 Phase 1 | ~30% |
 
 ### What works today
 
@@ -31,7 +31,7 @@ After **Loading → Title → Begin Transmission**, the player enters the **Broa
 ### Immediate next milestones
 
 1. **Production AI API** — serverless route for static `dist/` deployments
-2. **Plantasonic Platform Integration implementation prep** — review the completed import inventory and approve keep / promote / replace decisions before runtime changes
+2. **Plantasonic Platform Integration implementation prep** — review Phase 1 package wiring and approve keep / promote / replace decisions before runtime import changes
 3. **Rich lore panel** — render full transmission body text, not just titles
 4. **GIF export UI** — wire engine export APIs to Menu panel (documented but not built)
 5. **Branding cleanup** — align legacy "Beat Runner" labels with Broadcast Terminal direction
@@ -497,7 +497,7 @@ Today, progression is local-only (`signal9-broadcast-state-v1` in `localStorage`
 
 ## Phase 11 — Plantasonic Platform Integration
 
-**Status:** 🚧 Planning (~20% — documentation inventory complete)
+**Status:** 🚧 Phase 1 (~30% — Platform SDK/type dependencies connected)
 
 ### Goal
 
@@ -507,7 +507,7 @@ Prepare Signal 9 to consume the frozen Plantasonic Platform as an independent pr
 
 Plantasonic Platform is the reusable AI First Application Platform foundation. Signal 9 remains a separate product app that owns its broadcast identity, startup sequence, AI/game layer, MP3 transmission deck, video-to-ASCII direction, `--s9-*` semantic theme, and product content.
 
-The first milestone is an inventory and boundary pass only. Runtime behavior, imports, file locations, navigation, and engine behavior remain unchanged until the integration map is reviewed.
+The first milestone connected explicit Signal 9 dependencies on the frozen Platform SDK and shared types while preserving runtime behavior, imports, file locations, navigation, and engine behavior. Design System imports remain direct because the current Platform SDK does not expose replacement shell, instrument, Creative Workspace, CSS, or token entrypoints.
 
 ### Deliverables
 
@@ -517,18 +517,22 @@ The first milestone is an inventory and boundary pass only. Runtime behavior, im
 | Ownership boundary matrix | ✅ | `docs/PLATFORM_INTEGRATION_PLAN.md` |
 | Platform/demo/design/engine dependency inventory | ✅ | `docs/PLATFORM_INTEGRATION_PLAN.md` |
 | `@plantasonic/platform-demo/*` import classification | ✅ | Keep / promote / replace table documented |
+| Platform SDK dependency wiring | ✅ | `package.json`, `package-lock.json` |
+| Safe Design System import replacement | ⏸️ Deferred | No Platform package DS export surface exists yet |
 | MP3 sound adapter boundary documented | ✅ | `docs/PLATFORM_INTEGRATION_PLAN.md`, Phase 3 |
 | Signal 9 theme token boundary documented | ✅ | `docs/PLATFORM_INTEGRATION_PLAN.md`, README theme section |
-| Validation baseline | ⬜ | `pnpm typecheck`, `pnpm build`, `pnpm validate` |
+| Validation baseline | ✅ | `npm install`, `npm run typecheck`, `npm run build`, `npm run validate` |
 | Runtime import replacement | ⬜ | Explicitly deferred |
 
 ### First implementation phase
 
-1. Inventory every import from `@plantasonic/platform`, `@plantasonic/platform-types`, `@plantasonic/platform-demo/*`, `plantasonic-design-system`, `ascii-visual-engine`, and local `src/platform/*` shims.
-2. Classify each `@plantasonic/platform-demo/*` dependency as `keep`, `promote to Platform/App Kit`, or `replace with Signal 9 module`.
-3. Preserve `src/platform/mp3SoundEngineAdapter.ts` as the product-owned mission audio adapter unless a separate product milestone changes audio direction.
-4. Keep `src/styles/signal9-theme.css`, `src/styles/preset-themes.css`, and `src/theme/` as app-owned theme identity layered over Design System variables.
-5. Add validation evidence before any runtime changes.
+1. ✅ Inventory every import from `@plantasonic/platform`, `@plantasonic/platform-types`, `@plantasonic/platform-demo/*`, `plantasonic-design-system`, `ascii-visual-engine`, and local `src/platform/*` shims.
+2. ✅ Classify each `@plantasonic/platform-demo/*` dependency as `keep`, `promote to Platform/App Kit`, or `replace with Signal 9 module`.
+3. ✅ Add explicit local package dependencies for `@plantasonic/platform` and `@plantasonic/platform-types`.
+4. ✅ Preserve `src/platform/mp3SoundEngineAdapter.ts` as the product-owned mission audio adapter unless a separate product milestone changes audio direction.
+5. ✅ Keep `src/styles/signal9-theme.css`, `src/styles/preset-themes.css`, and `src/theme/` as app-owned theme identity layered over Design System variables.
+6. ⏸️ Defer Design System import replacement until Platform exposes safe DS entrypoints.
+7. ✅ Add validation evidence before any runtime changes.
 
 ### Out of scope
 
@@ -546,6 +550,8 @@ The first milestone is an inventory and boundary pass only. Runtime behavior, im
 - `plantasia-sound-engine` is installed while mission audio intentionally uses the MP3 adapter.
 - Startup ASCII and live stage ASCII have separate lifecycles and should not be accidentally merged.
 - Hardcoded product colors need classification before any token cleanup.
+- Local npm config disables dependency scripts and bin links today to avoid running sibling package prepare scripts or installing the unused Design System CLI bin.
+- Typecheck required a browser timer handle annotation in `src/startup/LoadingScreen.ts`; runtime behavior is unchanged.
 
 ---
 
