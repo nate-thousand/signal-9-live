@@ -1,0 +1,52 @@
+/**
+ * Transmission bar — layout and platform chrome visibility only.
+ * Color, typography, and interaction live in signal9-theme.css.
+ */
+
+/* Hide platform floating chrome — Signal 9 uses the transmission bar instead */
+.s9-themed .s9-instrument-layer [data-ps-cw-surface='transport'],
+.s9-themed .s9-instrument-layer [data-ps-cw-surface='inspector'],
+.s9-themed .s9-instrument-layer [data-ps-cw-surface='browser'],
+.s9-themed .s9-instrument-layer [data-ps-cw-surface='hud'] {
+  display: none !important;
+}
+
+.s9-transmission-bar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  pointer-events: auto;
+}
+
+.s9-app-root[data-s9-screen-mode='fullscreen'] .s9-transmission-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.s9-transmission-bar__transport {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.s9-transmission-bar__btn {
+  min-width: 4.5rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.s9-transmission-bar__presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.s9-transmission-bar__preset {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}

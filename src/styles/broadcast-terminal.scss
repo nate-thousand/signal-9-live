@@ -1,0 +1,335 @@
+/**
+ * Retro cyberpunk broadcast console — terminal layout over the ASCII stage.
+ * Uses --s9-* semantic tokens; does not replace the design system.
+ */
+
+.s9-broadcast {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) minmax(120px, 28vh) auto;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  color: var(--s9-fg, #c8b8e8);
+  font-family: var(--s9-font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.s9-broadcast > * {
+  pointer-events: auto;
+}
+
+.s9-broadcast__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.45rem 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--s9-accent, #7b5cff) 35%, transparent);
+  background: color-mix(in srgb, var(--s9-bg, #050208) 88%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--s9-accent) 12%, transparent);
+}
+
+.s9-broadcast__brand {
+  color: var(--s9-accent, #9b7bff);
+  font-weight: 700;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--s9-accent) 40%, transparent);
+}
+
+.s9-broadcast__stat {
+  opacity: 0.85;
+}
+
+.s9-broadcast__stat--online,
+.s9-broadcast__stat--live {
+  color: var(--s9-accent);
+}
+
+.s9-broadcast__stat--degraded,
+.s9-broadcast__stat--jamming {
+  color: #e8a84a;
+}
+
+.s9-broadcast__stat--offline,
+.s9-broadcast__stat--standby {
+  opacity: 0.55;
+}
+
+.s9-broadcast__body {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) minmax(0, 1fr) minmax(140px, 220px);
+  min-height: 0;
+  flex: 1;
+}
+
+.s9-broadcast__deck,
+.s9-broadcast__lore {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--s9-accent) 22%, transparent);
+  background: color-mix(in srgb, var(--s9-bg) 78%, transparent);
+  overflow: auto;
+  min-height: 0;
+}
+
+.s9-broadcast__deck {
+  border-right: none;
+}
+
+.s9-broadcast__lore {
+  border-left: none;
+}
+
+.s9-broadcast__center {
+  position: relative;
+  pointer-events: none;
+  min-height: 0;
+}
+
+.s9-broadcast__bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.s9-broadcast__panel-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.65rem;
+  color: var(--s9-accent);
+  letter-spacing: 0.12em;
+}
+
+.s9-broadcast__subhead {
+  margin: 0.65rem 0 0.25rem;
+  font-size: 0.6rem;
+  opacity: 0.7;
+}
+
+.s9-broadcast__deck-track {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+}
+
+.s9-broadcast__deck-controls {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.s9-broadcast__btn {
+  border: 1px solid color-mix(in srgb, var(--s9-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--s9-bg) 60%, transparent);
+  color: inherit;
+  font: inherit;
+  padding: 0.25rem 0.45rem;
+  cursor: pointer;
+}
+
+.s9-broadcast__btn:hover {
+  border-color: var(--s9-accent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--s9-accent) 25%, transparent);
+}
+
+.s9-broadcast__deck-meta,
+.s9-broadcast__deck-hint,
+.s9-broadcast__objective {
+  margin: 0.25rem 0;
+  opacity: 0.8;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.s9-broadcast__deck-hint {
+  font-size: 0.58rem;
+  opacity: 0.5;
+  margin-top: 0.75rem;
+}
+
+.s9-broadcast__lore-list,
+.s9-broadcast__char-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.s9-broadcast__lore-item,
+.s9-broadcast__char-item,
+.s9-broadcast__empty {
+  padding: 0.2rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--s9-fg) 8%, transparent);
+  text-transform: none;
+  font-size: 0.65rem;
+  line-height: 1.3;
+}
+
+.s9-broadcast__lore-cat,
+.s9-broadcast__char-callsign {
+  display: inline-block;
+  margin-right: 0.35rem;
+  color: var(--s9-accent);
+  font-size: 0.55rem;
+}
+
+.s9-broadcast__chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-top: 1px solid color-mix(in srgb, var(--s9-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--s9-bg) 92%, transparent);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    color-mix(in srgb, var(--s9-fg) 3%, transparent) 2px,
+    color-mix(in srgb, var(--s9-fg) 3%, transparent) 4px
+  );
+}
+
+.s9-broadcast-chat__history {
+  flex: 1;
+  overflow: auto;
+  padding: 0.45rem 0.65rem;
+  min-height: 4rem;
+  max-height: 14vh;
+}
+
+.s9-broadcast-chat__line {
+  margin: 0 0 0.35rem;
+  text-transform: none;
+  line-height: 1.35;
+  font-size: 0.68rem;
+}
+
+.s9-broadcast-chat__line--player {
+  color: #a8d4ff;
+}
+
+.s9-broadcast-chat__line--narrator {
+  color: var(--s9-accent);
+}
+
+.s9-broadcast-chat__line--system {
+  opacity: 0.55;
+}
+
+.s9-broadcast-chat__role {
+  display: inline-block;
+  width: 3.2rem;
+  opacity: 0.65;
+}
+
+.s9-broadcast-chat__form {
+  padding: 0 0.65rem 0.35rem;
+}
+
+.s9-broadcast-chat__input-row {
+  margin: 0;
+}
+
+.s9-broadcast__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem 0.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--s9-fg) 10%, transparent);
+}
+
+.s9-broadcast__choice {
+  border: 1px solid color-mix(in srgb, var(--s9-accent) 35%, transparent);
+  background: color-mix(in srgb, var(--s9-bg) 50%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 0.62rem;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  text-transform: none;
+}
+
+.s9-broadcast__choice:hover {
+  border-color: var(--s9-accent);
+  color: var(--s9-accent);
+}
+
+.s9-broadcast__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0.35rem 0.75rem;
+  border-top: 1px solid color-mix(in srgb, var(--s9-accent) 20%, transparent);
+  background: color-mix(in srgb, var(--s9-bg) 95%, transparent);
+  font-size: 0.58rem;
+  opacity: 0.85;
+}
+
+.s9-broadcast__ai-status--thinking {
+  color: #e8a84a;
+  animation: s9-broadcast-pulse 1s ease-in-out infinite;
+}
+
+.s9-broadcast__ai-status--error {
+  color: #ff6b6b;
+}
+
+@keyframes s9-broadcast-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* Terminal screen mode — stage visible through center column */
+.s9-app-root[data-s9-screen-mode='terminal'] .s9-instrument-layer {
+  z-index: 1;
+}
+
+.s9-app-root[data-s9-screen-mode='terminal'] .s9-screen-layer {
+  z-index: 2;
+  pointer-events: none;
+}
+
+.s9-app-root[data-s9-screen-mode='terminal'] .s9-instrument-layer .ps-control-menu,
+.s9-app-root[data-s9-screen-mode='terminal'] .s9-control-menu {
+  z-index: 30;
+}
+
+@media (max-width: 900px) {
+  .s9-broadcast__body {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto minmax(80px, 1fr);
+  }
+
+  .s9-broadcast__deck,
+  .s9-broadcast__lore {
+    border: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--s9-accent) 18%, transparent);
+    max-height: 18vh;
+  }
+
+  .s9-broadcast__center {
+    min-height: 12vh;
+  }
+}
+
+@media (max-width: 560px) {
+  .s9-broadcast {
+    grid-template-rows: auto minmax(60px, 12vh) minmax(140px, 42vh) auto;
+  }
+
+  .s9-broadcast__deck,
+  .s9-broadcast__lore {
+    display: none;
+  }
+
+  .s9-broadcast__body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .s9-broadcast-chat__history {
+    max-height: none;
+  }
+}

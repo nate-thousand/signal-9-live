@@ -1,0 +1,26 @@
+/**
+ * Signal 9 styles — Design System layers first, then app theme.
+ * Semantic tokens live in signal9-theme.css (--s9-*).
+ */
+
+@import 'plantasonic-design-system/scss/bootstrap-theme.scss';
+@import 'bootstrap/scss/bootstrap';
+@import 'plantasonic-design-system/scss/css-theme-bridge.scss';
+@import 'plantasonic-design-system/scss/bootstrap-components.scss';
+@import 'plantasonic-design-system/scss/bootstrap-utilities.scss';
+@import 'plantasonic-design-system/scss/plantasonic-components.scss';
+@import 'plantasonic-design-system/scss/primitives.scss';
+@import 'plantasonic-design-system/scss/components.scss';
+@import 'plantasonic-design-system/scss/application-shell.scss';
+@import 'plantasonic-design-system/scss/instrument.scss';
+@import 'plantasonic-design-system/scss/creative-workspace.scss';
+@import './signal9-theme.css';
+@import './preset-themes.css';
+@import './startup.css';
+@import './terminal.scss';
+@import './app-layout.scss';
+@import './mission-flow.scss';
+@import './transmission-controls.scss';
+@import './video-controls.scss';
+@import './control-menu.scss';
+@import './broadcast-terminal.scss';

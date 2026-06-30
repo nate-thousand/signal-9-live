@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@plantasonic/platform": ["../plantasonic-platform/packages/sdk/src/index.ts"],
+      "@plantasonic/platform-types": [
+        "../plantasonic-platform/packages/shared-types/src/index.ts"
+      ],
+      "@plantasonic/platform-demo/instrument-app": [
+        "src/platform/signal9InstrumentApp.ts"
+      ],
+      "@plantasonic/platform-demo/*": [
+        "../plantasonic-platform/apps/demo/src/*"
+      ],
+      "plantasonic-design-system/shell": [
+        "node_modules/plantasonic-design-system/src/shell/index.ts"
+      ],
+      "plantasonic-design-system/instrument": [
+        "node_modules/plantasonic-design-system/src/instrument/index.ts"
+      ],
+      "plantasonic-design-system/creative-workspace": [
+        "node_modules/plantasonic-design-system/src/creative-workspace/index.ts"
+      ]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
+}

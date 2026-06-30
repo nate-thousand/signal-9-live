@@ -1,0 +1,88 @@
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+.s9-app-shell,
+.s9-app-root {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Stage + platform chrome (transport, presets, inspector) */
+.s9-instrument-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  min-height: 0;
+}
+
+.s9-instrument-layer .ps-application-shell,
+.s9-instrument-layer .ps-creative-workspace {
+  height: 100%;
+}
+
+/* Mission overlays — must not blanket-cover platform floating UI */
+.s9-screen-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  pointer-events: none;
+  background: transparent;
+}
+
+.s9-screen-layer > * {
+  pointer-events: auto;
+}
+
+/* Briefing / debrief: mission panel covers the stage */
+.s9-app-root[data-s9-screen-mode='fullscreen'] .s9-screen-layer {
+  z-index: 3;
+}
+
+.s9-app-root[data-s9-screen-mode='fullscreen'] .s9-mission-flow {
+  flex: 1;
+  min-height: 100%;
+  background: var(--s9-bg);
+}
+
+/* Start run: dimmed veil over the live ASCII stage */
+.s9-app-root[data-s9-screen-mode='dimmed'] .s9-screen-layer {
+  z-index: 3;
+}
+
+.s9-app-root[data-s9-screen-mode='dimmed'] .s9-mission-flow {
+  flex: 1;
+  min-height: 100%;
+  background: color-mix(in srgb, var(--s9-bg) 42%, transparent);
+  pointer-events: none;
+}
+
+.s9-app-root[data-s9-screen-mode='dimmed'] .s9-mission-flow__panel {
+  pointer-events: auto;
+}
+
+/* Beat runner: platform chrome stays on top; mission header floats above */
+.s9-app-root[data-s9-screen-mode='hud'] .s9-instrument-layer {
+  z-index: 2;
+}
+
+.s9-app-root[data-s9-screen-mode='hud'] .s9-screen-layer {
+  z-index: 1;
+  justify-content: flex-start;
+}
+
+.s9-beat-runner__header--overlay {
+  position: fixed;
+  top: 0.75rem;
+  left: var(--s9-space-panel);
+  right: var(--s9-space-panel);
+  z-index: 20;
+}

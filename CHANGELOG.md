@@ -11,3 +11,5 @@
 - Added repo-local npm config so `npm install` avoids sibling package prepare scripts and unused Design System CLI bin links.
 - Updated npm scripts to call local TypeScript and Vite entrypoints directly so validation works with npm installs that skip bin links.
 - Fixed a browser timer type annotation in `src/startup/LoadingScreen.ts` so the Phase 1 typecheck baseline passes without changing runtime behavior.
+- Added `docs/PLATFORM_IMPORT_MAP.md` with keep / promote / replace / defer decisions for Platform, demo, Design System, engine, and local shim imports.
+- Established the Signal 9 app git baseline while excluding the handoff RTF and stale pnpm lock from source control.

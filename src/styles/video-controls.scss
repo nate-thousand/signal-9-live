@@ -1,0 +1,153 @@
+/**
+ * Video bar — layout only. Colors from signal9-theme.css.
+ */
+
+.s9-video-bar {
+  position: relative;
+  max-height: min(42vh, 22rem);
+  overflow: auto;
+  padding: 0.65rem 0.75rem;
+  pointer-events: auto;
+}
+
+.s9-app-root[data-s9-screen-mode='fullscreen'] .s9-video-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.s9-video-bar__header {
+  font-family: var(--s9-font-hud);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--s9-transmission);
+  margin-bottom: 0.5rem;
+}
+
+.s9-video-bar__row,
+.s9-video-bar__slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.s9-video-bar__label {
+  flex: 0 0 6.5rem;
+  font-family: var(--s9-font-hud);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--s9-text-muted);
+}
+
+.s9-video-bar__select {
+  flex: 1;
+  min-width: 0;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--s9-panel-border);
+  border-radius: var(--s9-radius-sm);
+  background: var(--s9-surface);
+  color: var(--s9-text);
+  font-family: var(--s9-font-body);
+  font-size: 0.8rem;
+}
+
+.s9-video-bar__row--toggle {
+  flex-wrap: wrap;
+  margin-bottom: 0.55rem;
+}
+
+.s9-video-bar__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.s9-video-bar__toggle-input {
+  accent-color: var(--s9-signal);
+}
+
+.s9-video-bar__toggle-text {
+  font-family: var(--s9-font-hud);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--s9-text);
+}
+
+.s9-video-bar__toggle-hint {
+  flex: 1 1 100%;
+  padding-inline-start: 1.35rem;
+  font-family: var(--s9-font-body);
+  font-size: 0.7rem;
+  color: var(--s9-text-muted);
+}
+
+.s9-video-bar__transport {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.s9-video-bar__btn {
+  padding: 0.3rem 0.55rem;
+  font-family: var(--s9-font-hud);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.s9-video-bar__sliders {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.s9-video-bar__range {
+  flex: 1;
+  accent-color: var(--s9-signal);
+}
+
+.s9-transmission-debug {
+  position: fixed;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 1200;
+  padding: 0.45rem 0.55rem;
+  font-family: var(--s9-font-mono);
+  font-size: 0.62rem;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  color: var(--s9-signal-soft);
+  background: color-mix(in srgb, var(--s9-overlay) 92%, transparent);
+  border: 1px solid var(--s9-panel-border);
+  border-radius: var(--s9-radius-sm);
+  white-space: pre;
+  pointer-events: none;
+  opacity: 0.88;
+}
+
+.s9-themed .s9-video-bar {
+  background: var(--s9-glass-bg);
+  border: 1px solid var(--s9-panel-border);
+  border-radius: var(--s9-radius-md);
+  box-shadow: var(--s9-shadow-panel);
+  backdrop-filter: blur(16px);
+}
+
+.s9-themed .s9-video-bar__btn {
+  background: color-mix(in srgb, var(--s9-surface) 88%, transparent);
+  border: 1px solid var(--s9-panel-border);
+  border-radius: var(--s9-radius-sm);
+  color: var(--s9-text);
+}
+
+.s9-themed .s9-video-bar__btn:hover {
+  border-color: var(--s9-border-strong);
+  color: var(--s9-signal-soft);
+  box-shadow: var(--s9-glow-soft);
+}

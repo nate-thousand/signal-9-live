@@ -1,0 +1,215 @@
+/**
+ * Vintage terminal UI — scanline prompts, no modal chrome.
+ */
+
+.s9-terminal {
+  font-family: var(--s9-font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--s9-text-muted);
+  width: min(28rem, 100%);
+}
+
+.s9-terminal__line {
+  margin: 0.2rem 0;
+  opacity: 0;
+  text-align: left;
+  transition: opacity 0.12s steps(2);
+}
+
+.s9-terminal__line--visible,
+.s9-terminal--static .s9-terminal__line {
+  opacity: 1;
+}
+
+.s9-terminal__line--accent {
+  color: var(--s9-signal-soft);
+}
+
+.s9-terminal__prompt {
+  color: var(--s9-signal);
+  margin-inline-end: 0.35rem;
+}
+
+.s9-terminal__cursor {
+  display: inline-block;
+  margin-inline-start: 0.1rem;
+  color: var(--s9-signal);
+  animation: s9-cursor-blink 1s step-end infinite;
+}
+
+.s9-terminal__cursor--inline {
+  margin-inline-start: 0;
+}
+
+.s9-terminal__input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.65rem;
+  padding: 0.15rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--s9-signal) 28%, transparent);
+  cursor: text;
+}
+
+.s9-terminal__input-label {
+  color: var(--s9-text-muted);
+  white-space: nowrap;
+}
+
+.s9-terminal__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--s9-signal-soft);
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  padding: 0;
+  outline: none;
+}
+
+.s9-terminal__input::placeholder {
+  color: var(--s9-offline);
+}
+
+.s9-terminal--hud {
+  position: fixed;
+  top: 0.65rem;
+  left: var(--s9-space-panel);
+  right: var(--s9-space-panel);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  pointer-events: none;
+}
+
+.s9-terminal--hud .s9-terminal__line {
+  margin: 0;
+  opacity: 1;
+}
+
+.s9-terminal--hud .s9-terminal__action {
+  pointer-events: auto;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--s9-signal);
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.s9-terminal--hud .s9-terminal__action:hover {
+  color: var(--s9-signal-soft);
+}
+
+.s9-terminal--flash {
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  padding: 0.35rem 0.5rem;
+  background: color-mix(in srgb, var(--s9-bg) 72%, transparent);
+  animation: s9-terminal-flash 4s ease forwards;
+}
+
+@keyframes s9-terminal-flash {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* Engine-driven ASCII logo — Signal 9 */
+.s9-loading__mark,
+.s9-title__mark {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: clamp(1.75rem, 5vh, 3rem);
+}
+
+.s9-ascii-logo {
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: min(96vw, 52rem);
+  cursor: inherit;
+  touch-action: none;
+}
+
+.s9-ascii-logo__output {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--s9-signal) !important;
+  background: transparent !important;
+  text-shadow: var(--s9-glow);
+  letter-spacing: 0;
+  overflow: visible !important;
+  width: max-content;
+  max-width: 100%;
+  animation: s9-ascii-logo-pulse 3.2s ease-in-out infinite;
+}
+
+.s9-ascii-logo__output--static {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: clamp(0.45rem, 1.8vw, 0.62rem);
+  font-weight: 400;
+  line-height: 1;
+  white-space: pre;
+  text-align: center;
+  animation: s9-signal-pulse 3s ease-in-out infinite;
+}
+
+.s9-ascii-logo--sm .s9-ascii-logo__output:not(.s9-ascii-logo__output--static) {
+  transform: scale(0.88);
+  transform-origin: center top;
+}
+
+.s9-ascii-logo--md .s9-ascii-logo__output:not(.s9-ascii-logo__output--static) {
+  transform: scale(0.94);
+  transform-origin: center top;
+}
+
+.s9-ascii-logo--lg .s9-ascii-logo__output:not(.s9-ascii-logo__output--static) {
+  transform: scale(1);
+  transform-origin: center top;
+}
+
+.s9-ascii-logo--xl .s9-ascii-logo__output:not(.s9-ascii-logo__output--static) {
+  transform: scale(1.06);
+  transform-origin: center top;
+}
+
+@keyframes s9-ascii-logo-pulse {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s9-ascii-logo__output,
+  .s9-ascii-logo__output--static,
+  .s9-terminal--flash {
+    animation: none !important;
+  }
+}

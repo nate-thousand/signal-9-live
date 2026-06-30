@@ -1,0 +1,78 @@
+/**
+ * Collapsible control menu — transmission + video panels behind a bottom Menu toggle.
+ */
+
+.s9-control-menu {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transform: translateX(-50%);
+  pointer-events: none;
+  max-width: min(100vw - 2rem, 42rem);
+  width: max-content;
+}
+
+.s9-control-menu__toggle {
+  pointer-events: auto;
+  min-width: 5.5rem;
+  padding: 0.45rem 1.25rem;
+  font-family: var(--s9-font-hud);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: var(--s9-radius-md);
+  transition:
+    border-color var(--s9-fast) ease,
+    box-shadow var(--s9-fast) ease,
+    color var(--s9-fast) ease;
+}
+
+.s9-control-menu__panels {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: min(100vw - 2rem, 42rem);
+}
+
+.s9-control-menu__panels[hidden] {
+  display: none;
+}
+
+.s9-app-root[data-s9-screen-mode='fullscreen'] .s9-control-menu {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.s9-themed .s9-control-menu__toggle {
+  background: var(--s9-glass-bg);
+  border: 1px solid var(--s9-panel-border);
+  color: var(--s9-text);
+  box-shadow: var(--s9-shadow-panel);
+  backdrop-filter: blur(16px);
+}
+
+.s9-themed .s9-control-menu__toggle:hover {
+  border-color: var(--s9-border-strong);
+  color: var(--s9-signal-soft);
+  box-shadow: var(--s9-glow-soft);
+}
+
+.s9-themed .s9-control-menu__toggle:focus-visible {
+  outline: 2px solid var(--s9-border-strong);
+  outline-offset: 2px;
+}
+
+.s9-themed .s9-control-menu[data-s9-menu-open='true'] .s9-control-menu__toggle {
+  border-color: var(--s9-border-strong);
+  color: var(--s9-signal);
+  box-shadow: var(--s9-glow-soft);
+}
