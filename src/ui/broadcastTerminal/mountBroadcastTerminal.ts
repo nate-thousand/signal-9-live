@@ -18,6 +18,22 @@ import {
   playVideoTransmission,
   restartVideoTransmission,
 } from '../../platform/videoAsciiSession.js';
+import {
+  renderAsciiGlobe,
+  renderAsciiNetworkMap,
+  renderAsciiPortrait,
+  renderAsciiSignalMeter,
+  renderAsciiSpectrum,
+  renderAsciiTelemetryBars,
+  renderAsciiWaveform,
+  updateAsciiGlobe,
+  updateAsciiNetworkMap,
+  updateAsciiPortrait,
+  updateAsciiSignalMeter,
+  updateAsciiSpectrum,
+  updateAsciiTelemetryBars,
+  updateAsciiWaveform,
+} from '../hudVisuals/index.js';
 
 type RadioSource = 'local' | 'mixcloud' | 'soundcloud' | 'relay';
 
@@ -76,20 +92,6 @@ function sourceLabel(source: RadioSource): string {
   }
 }
 
-function renderSpectrumBars(count = 24): string {
-  return Array.from({ length: count }, (_, index) => {
-    const height = 18 + ((index * 17) % 54);
-    return `<i style="--s9-bar:${height}%"></i>`;
-  }).join('');
-}
-
-function renderWaveformTicks(count = 44): string {
-  return Array.from({ length: count }, (_, index) => {
-    const height = 22 + ((index * 23) % 72);
-    return `<i style="--s9-wave:${height}%"></i>`;
-  }).join('');
-}
-
 function renderHistory(): string {
   const { conversationHistory } = broadcastGameState.getState();
   return conversationHistory
@@ -143,14 +145,14 @@ function renderRadioPanel(): string {
 
       <div class="s9-radio__art" aria-hidden="true">
         <div class="s9-radio__art-grid"></div>
-        <span>S9</span>
+        ${renderAsciiGlobe()}
       </div>
 
       <p class="s9-radio__source" data-s9-radio-source>${sourceLabel(radioSource)}</p>
       <p class="s9-radio__track" data-s9-deck-track>${escapeHtml(activeTrackLabel(s.currentTrack))}</p>
       <p class="s9-radio__meta">FREQ <span data-s9-radio-frequency>${frequencyForTrack(s.currentTrack)}</span> FM // MOOD <span data-s9-deck-mood>${escapeHtml(s.currentMood)}</span></p>
 
-      <div class="s9-radio__waveform" data-s9-waveform aria-hidden="true">${renderWaveformTicks()}</div>
+      <div class="s9-radio__waveform" data-s9-waveform aria-hidden="true">${renderAsciiWaveform()}</div>
       <div class="s9-radio__progress" aria-label="Playback progress">
         <span data-s9-radio-progress style="inline-size:${progress}%"></span>
       </div>
@@ -159,7 +161,7 @@ function renderRadioPanel(): string {
         <span data-s9-radio-duration>${formatTime(duration)}</span>
       </div>
 
-      <div class="s9-radio__spectrum" data-s9-spectrum aria-hidden="true">${renderSpectrumBars()}</div>
+      <div class="s9-radio__spectrum" data-s9-spectrum aria-hidden="true">${renderAsciiSpectrum()}</div>
 
       <div class="s9-radio__controls">
         <button type="button" class="s9-broadcast__btn" data-s9-deck="play" aria-pressed="${playing}">${playing ? 'STOP' : 'PLAY'}</button>
@@ -213,13 +215,16 @@ function renderMissionPanel(): string {
       <div class="s9-broadcast__mini-panel">
         <h2 class="s9-broadcast__panel-title">MISSION CONSOLE</h2>
         <p class="s9-broadcast__objective" data-s9-objective>${escapeHtml(s.currentMission)}</p>
+        ${renderAsciiTelemetryBars()}
       </div>
       <div class="s9-broadcast__mini-panel">
         <h3 class="s9-broadcast__subhead">Memory Nodes</h3>
+        <pre class="s9-hud-visual s9-ascii-memory" data-s9-memory-preview aria-label="Memory node preview">MEMORY NODE // ${escapeHtml(s.unlockedLore[s.unlockedLore.length - 1]?.title ?? 'NO SIGNAL')}</pre>
       <ul class="s9-broadcast__lore-list" data-s9-lore-list>${lore || '<li class="s9-broadcast__empty">—</li>'}</ul>
       </div>
       <div class="s9-broadcast__mini-panel">
         <h3 class="s9-broadcast__subhead">Echo Files</h3>
+        ${renderAsciiPortrait()}
       <ul class="s9-broadcast__char-list" data-s9-char-list>${chars || '<li class="s9-broadcast__empty">—</li>'}</ul>
       </div>
     </section>
@@ -236,6 +241,10 @@ function renderVisualizerFrame(): string {
         <span data-s9-footer-ascii>ASCII ${escapeHtml(s.currentAsciiPreset)}</span>
       </div>
       <div class="s9-broadcast__visual-reticle" aria-hidden="true"></div>
+      <div class="s9-broadcast__visual-modules" aria-hidden="true">
+        ${renderAsciiNetworkMap()}
+        ${renderAsciiSignalMeter('broadcast', 'Broadcast')}
+      </div>
       <div class="s9-broadcast__visual-telemetry" aria-hidden="true">
         <span>THRESHOLD</span>
         <span>DITHER</span>
@@ -261,6 +270,7 @@ function renderHud(): string {
       <span>DISTRICT <b data-s9-footer-district>${escapeHtml(s.currentLocation)}</b></span>
       <span>TIME <b data-s9-hud-time>${new Date().toLocaleTimeString([], { hour12: false })}</b></span>
       <span class="s9-broadcast__ai-status s9-broadcast__ai-status--${s.aiStatus}" data-s9-footer-ai>AI ${s.aiStatus.toUpperCase()}</span>
+      <span class="s9-broadcast__hud-packet">${renderAsciiSignalMeter('packet', 'Packet')}</span>
     </footer>
   `;
 }
@@ -273,6 +283,10 @@ function renderShell(): string {
         <div class="s9-broadcast__panel-chrome">
           <h2 class="s9-broadcast__panel-title">CHAT TERMINAL</h2>
           <span class="s9-broadcast__panel-state">KEYBOARD PRIMARY</span>
+        </div>
+        <div class="s9-broadcast-chat__latest" aria-hidden="true">
+          <span>LATEST TRANSMISSION WAVEFORM</span>
+          ${renderAsciiWaveform()}
         </div>
         <div class="s9-broadcast-chat__history" data-s9-chat-history role="log">${renderHistory()}</div>
         <form class="s9-broadcast-chat__form" data-s9-chat-form>
@@ -333,6 +347,8 @@ function patchDom(root: HTMLElement): void {
   root.querySelector<HTMLElement>('[data-s9-hud-frequency]')!.textContent = `${frequencyForTrack(s.currentTrack)} FM`;
   root.querySelector<HTMLElement>('[data-s9-hud-memory]')!.textContent = String(s.unlockedLore.length);
   root.querySelector<HTMLElement>('[data-s9-hud-broadcast]')!.textContent = s.broadcastStatus.toUpperCase();
+  root.querySelector<HTMLElement>('[data-s9-memory-preview]')!.textContent =
+    `MEMORY NODE // ${s.unlockedLore[s.unlockedLore.length - 1]?.title ?? 'NO SIGNAL'}`;
   const aiEl = root.querySelector<HTMLElement>('[data-s9-footer-ai]');
   if (aiEl) {
     aiEl.textContent = `AI ${s.aiStatus.toUpperCase()}`;
@@ -457,9 +473,16 @@ function updateLiveTelemetry(root: HTMLElement): void {
   const features = adapter?.getAudioFeatures();
   const status = adapter?.getStatus();
   const visualStatus = visual?.getStatus();
+  const amplitude = features?.amplitude ?? 0;
+  const bass = features?.bass ?? 0;
+  const mids = features?.mids ?? 0;
+  const highs = features?.highs ?? 0;
+  const transient = features?.transient ?? 0;
+  const phase = Date.now() / 1000;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const progress = snapshot && snapshot.duration > 0 ? Math.min(100, (snapshot.currentTime / snapshot.duration) * 100) : 0;
-  const signal = Math.round(58 + (features?.amplitude ?? 0) * 28 + (features?.bass ?? 0) * 14);
-  const cpu = Math.round(14 + (features?.amplitude ?? 0) * 18 + (features?.transient ?? 0) * 11);
+  const signal = Math.round(58 + amplitude * 28 + bass * 14);
+  const cpu = Math.round(14 + amplitude * 18 + transient * 11);
   const fps = Math.round(visualStatus?.fps ?? 60);
 
   root.querySelector<HTMLElement>('[data-s9-radio-state]')!.textContent = status?.playing ? 'ON AIR' : 'STANDBY';
@@ -475,17 +498,52 @@ function updateLiveTelemetry(root: HTMLElement): void {
   root.querySelector<HTMLElement>('[data-s9-hud-echo]')!.textContent =
     state.discoveredCharacters.length > 0 ? 'LOCKED' : state.aiStatus === 'thinking' ? 'TRACE' : 'LISTENING';
 
-  const bars = root.querySelectorAll<HTMLElement>('[data-s9-spectrum] i');
-  bars.forEach((bar, index) => {
-    const base = index % 3 === 0 ? features?.bass : index % 3 === 1 ? features?.mids : features?.highs;
-    const height = 10 + (base ?? 0.08) * 82 + ((index * 7) % 10);
-    bar.style.setProperty('--s9-bar', `${Math.min(96, height)}%`);
+  updateAsciiWaveform(root, { amplitude, bass, mids, highs, transient, phase, reducedMotion });
+  updateAsciiSpectrum(root, { bass, mids, highs, transient, phase, reducedMotion });
+  updateAsciiGlobe(root, {
+    networkStatus: state.networkStatus,
+    broadcastStatus: state.broadcastStatus,
+    phase,
+    reducedMotion,
   });
-
-  const ticks = root.querySelectorAll<HTMLElement>('[data-s9-waveform] i');
-  ticks.forEach((tick, index) => {
-    const height = 18 + (features?.amplitude ?? 0.1) * 62 + Math.sin(Date.now() / 180 + index) * 16;
-    tick.style.setProperty('--s9-wave', `${Math.max(8, Math.min(92, height))}%`);
+  updateAsciiNetworkMap(root, {
+    location: state.currentLocation,
+    networkStatus: state.networkStatus,
+    packetActivity: Math.min(1, amplitude + transient),
+    phase,
+    reducedMotion,
+  });
+  updateAsciiTelemetryBars(root, {
+    bars: [
+      { label: 'cpu', value: cpu / 100 },
+      { label: 'fps', value: fps / 60 },
+      { label: 'mem', value: Math.min(1, state.unlockedLore.length / 9) },
+      { label: 'ai', value: state.aiStatus === 'thinking' ? 0.85 : state.aiStatus === 'error' ? 0.2 : 0.55 },
+      { label: 'tx', value: state.broadcastStatus === 'live' ? 0.96 : state.broadcastStatus === 'jamming' ? 0.35 : 0.5 },
+    ],
+  });
+  updateAsciiSignalMeter(root, 'broadcast', {
+    label: 'Broadcast',
+    value: signal / 100,
+  });
+  updateAsciiSignalMeter(root, 'packet', {
+    label: 'Packet',
+    value: Math.min(1, amplitude + transient * 0.8 + (state.aiStatus === 'thinking' ? 0.2 : 0)),
+    variant: 'inline',
+  });
+  updateAsciiPortrait(root, {
+    callsign: state.discoveredCharacters[0]?.callsign,
+    status:
+      state.networkStatus === 'offline'
+        ? 'offline'
+        : state.discoveredCharacters.length > 0
+          ? 'locked'
+          : state.aiStatus === 'thinking'
+            ? 'trace'
+            : 'listening',
+    interference: Math.min(1, transient + (state.networkStatus === 'degraded' ? 0.35 : 0)),
+    phase,
+    reducedMotion,
   });
 }
 

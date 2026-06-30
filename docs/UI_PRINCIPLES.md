@@ -84,6 +84,15 @@ Avoid component thinking like:
 
 Generic primitives can exist in code, but visible design should read as equipment.
 
+## Interface And Visual Content Layers
+
+Signal 9 uses two coordinated layers inside the Home HUD.
+
+- The ASCII Engine and HUD ASCII modules are the visual content layer: waveform, spectrum, Echo portrait, network map, telemetry bars, signal meters, globe, scan effects, and packet activity.
+- React, DOM, and CSS are the interface structure layer: panel frames, labels, buttons, tabs, chat, mission copy, radio controls, layout, accessibility, and responsive behavior.
+
+Do not collapse the interface into one giant ASCII canvas. Panel structure should remain inspectable, accessible, and controllable as normal UI, while the live visual content inside each equipment bay may be ASCII, canvas, SVG, or generated instrumentation.
+
 ## Panel Principles
 
 Every panel should define:

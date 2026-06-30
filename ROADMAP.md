@@ -17,7 +17,7 @@ Signal 9 is an **AI-first interactive cyberpunk broadcast terminal** built on th
 | 3 | Audio Engine | 🚧 In Progress | ~78% |
 | 4 | AI Platform | 🚧 In Progress | ~65% |
 | 5 | Signal 9 Game | 🚧 In Progress | ~40% |
-| 6 | Retro Console UI | 🚧 In Progress | ~88% |
+| 6 | Retro Console UI | 🚧 In Progress | ~92% |
 | 7 | Asset Library | 🚧 In Progress | ~60% |
 | 8 | Visual Reactivity | ✅ Complete | ~85% |
 | 9 | Content Creation Tools | ⬜ Planned | ~0% |
@@ -297,6 +297,11 @@ The Broadcast Terminal is the primary post-entry UI: status bar, deck, transpare
 | Three dynamic AI choice buttons | ✅ | Left panel |
 | Center ASCII Visual Engine frame | ✅ | Transparent over Platform stage |
 | Signal 9 Radio panel | ✅ | Right panel |
+| Embedded ASCII HUD visual modules | ✅ | `src/ui/hudVisuals/` |
+| Latest transmission waveform | ✅ | Chat + radio panels |
+| Radio spectrum equalizer | ✅ | Radio panel |
+| Echo portrait / network map / globe | ✅ | Right and center HUD panels |
+| Footer packet activity meter | ✅ | Bottom HUD |
 | Mission / Memory / Echo panels | ✅ | Right panel |
 | Bottom HUD telemetry | ✅ | Frequency, signal, Echo, memory, TX, CPU, FPS, mission, district, time |
 | Responsive console (mobile collapse) | ✅ | `broadcast-terminal.scss` |
@@ -308,9 +313,9 @@ The Broadcast Terminal is the primary post-entry UI: status bar, deck, transpare
 | Art direction doctrine | ✅ | `docs/ART_DIRECTION.md` |
 | UI principles | ✅ | `docs/UI_PRINCIPLES.md` |
 | v0 / Figma design guidelines | ✅ | `docs/V0_DESIGN_GUIDELINES.md` |
-| Radio interface | ⬜ | — |
+| Radio interface | 🚧 | Local playback live; external sources pending |
 | Transmission browser | ⬜ | — |
-| ASCII progress bars | ⬜ | — |
+| ASCII progress bars | ✅ | `AsciiSignalMeter`, `AsciiTelemetryBars` |
 | Dedicated mission console screen | ⬜ | Merged into Broadcast Terminal |
 | Lore detail expansion UI | ⬜ | — |
 | Inventory panel | ⬜ | — |
@@ -383,7 +388,7 @@ The ASCII stage must breathe with the broadcast — reacting to music, AI state 
 
 ### Description
 
-Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, which modulates engine parameters (density, motion, brightness, glitch). Bass drives glyph scale pulses. AI responses switch video sources, ASCII profiles, and preset themes. Slider controls map through `transmissionControlState.ts` with tuned 25%–75% threshold bands.
+Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, which modulates engine parameters (density, motion, brightness, glitch). The Home HUD also embeds lightweight ASCII instruments fed by the same analyzer, playback state, game state, mission state, Echo state, network status, and derived packet activity. Bass drives glyph scale pulses. AI responses switch video sources, ASCII profiles, and preset themes. Slider controls map through `transmissionControlState.ts` with tuned 25%–75% threshold bands.
 
 ### Deliverables
 
@@ -399,6 +404,8 @@ Audio features from the MP3 analyzer feed the Platform Audio Reactive Bridge, wh
 | Threshold / effect 25%–75% bands | ✅ | `transmissionControls.ts` |
 | Video post passes (threshold, feedback, scanlines, glitch) | ✅ | Engine + adapter |
 | Background image blend on AI signal | ✅ | `[data-s9-bg-image]` overlay |
+| HUD waveform / spectrum / packet instruments | ✅ | `src/ui/hudVisuals/`, `mountBroadcastTerminal.ts` |
+| Echo portrait / network pulse / globe telemetry | ✅ | Derived from game + network + AI state |
 | ASCII reacts to explicit gameplay events | 🚧 | Only via AI preset changes |
 | Video sync to beat clock | ⬜ | — |
 | Image crossfade transitions | ⬜ | Instant opacity today |
