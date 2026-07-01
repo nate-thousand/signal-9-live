@@ -27,9 +27,9 @@ export const SIGNAL_9_PRESET_MAPPING_NOTES = {
   renderer: 'ascii-visual-engine (Plantasia ASCII Visual Engine)',
   audioSource: 'public/assets/audio/*.mp3 (one track per preset → Audio Reactive Bridge)',
   presets: [
-    { bundle: 'broadcast', track: 'atmo-beats4.mp3', sound: 'root', visual: 'ambient' },
-    { bundle: 'interference', track: 'dead-wave-prime1.mp3', sound: 'vine', visual: 'glyphCorruptedBroadcast' },
-    { bundle: 'jammer', track: 'ghost-sonic-shadow.mp3', sound: 'mycelium', visual: 'glyphParticleNebula' },
+    { bundle: 'broadcast', track: 'logo-themes-1_PN.mp3', sound: 'root', visual: 'ambient' },
+    { bundle: 'interference', track: 'dust-data-loops.mp3', sound: 'vine', visual: 'glyphCorruptedBroadcast' },
+    { bundle: 'jammer', track: 'dust-data-loops.mp3', sound: 'mycelium', visual: 'glyphParticleNebula' },
     { bundle: 'uplink', track: 'dust-data-loops.mp3', sound: 'mutation', visual: 'chaotic' },
   ],
 } as const;

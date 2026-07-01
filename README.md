@@ -27,8 +27,8 @@ Underground resistance broadcast experience built on [Plantasonic Platform](http
 |------|--------|
 | Entry Screen / ASCII logo / title sequence | **Live** — cold boot, diagnostics, Signal acquisition, press ENTER |
 | Home Terminal shell | **Live** — left chat, center ASCII engine, right radio, bottom HUD |
-| Signal 9 Radio (MP3 + preset engine) | **Live** — local soundtrack playback, track selector, waveform, spectrum, volume |
-| Radio source selector | **Prototype** — Mixcloud, SoundCloud, and streaming radio modes selectable; external ingest pending |
+| Signal 9 Radio (local MP3 mixtapes) | **Live** — local soundtrack playback, track selector, waveform, spectrum, volume |
+| Radio source | **Local only** — `public/assets/audio/` mixtapes and carrier presets |
 | AI Chat Terminal | **Live** — stub AI offline; OpenAI when `OPENAI_API_KEY` set |
 | ASCII Visual Display | **Live** — existing video-to-ASCII engine + audio reactive bridge |
 | Bottom HUD telemetry | **Live** — frequency, signal, Echo, Memory Nodes, TX, CPU, FPS, mission, district, time |
@@ -84,14 +84,17 @@ Legacy screen ids (`beat-runner`) delegate to the broadcast terminal. Mission de
 
 ### Transmission audio (MP3)
 
-Four preset tracks live in `public/assets/audio/`:
+Local audio lives in `public/assets/audio/`:
 
-| Preset | File |
-|--------|------|
-| Broadcast | `atmo-beats4.mp3` |
-| Interference | `dead-wave-prime1.mp3` |
-| Jammer | `ghost-sonic-shadow.mp3` |
-| Uplink | `dust-data-loops.mp3` |
+| Kind | File |
+|------|------|
+| Broadcast carrier | `logo-themes-1_PN.mp3` |
+| Uplink carrier | `dust-data-loops.mp3` |
+| Mixtape | `Boogie Times - 2026 - Mix 1_PN.mp3` |
+| Mixtape | `Dub Mix - 02.07.26_PN.mp3` |
+| Ambient tape | `dj-null-memory-eraser.mp3` |
+
+Carrier presets **Interference** and **Jammer** still drive ASCII/visual profiles; their MP3 aliases map to `dust-data-loops.mp3` until dedicated files are added.
 
 During missions, the active preset’s MP3 is the **only** audio source for the Platform Audio Reactive Bridge — the plantasia sound-engine synth is not started. Analysis (bass, mids, highs, amplitude, transients) is derived from the MP3 via Web Audio and mapped into the ASCII Visual Engine.
 

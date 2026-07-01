@@ -11,6 +11,7 @@ import {
   scaleAudioReactiveFeature,
 } from '../config/audioReactiveConfig.js';
 import { SIGNAL_9_TRANSMISSION_AUDIO_PATH } from '../audio/transmissionTracks.js';
+import { SIGNAL_9_LOCAL_AUDIO_ENABLED } from '../config/radioConfig.js';
 
 export interface CreateMp3SoundEngineAdapterOptions {
   eventBus: PlatformEventBus;
@@ -284,6 +285,8 @@ export function createMp3SoundEngineAdapter(
   };
 
   const ensureAudioGraph = async (): Promise<void> => {
+    if (!SIGNAL_9_LOCAL_AUDIO_ENABLED) return;
+
     if (!audioContext) {
       audioContext = new AudioContext();
       analyser = audioContext.createAnalyser();
@@ -308,6 +311,15 @@ export function createMp3SoundEngineAdapter(
     },
 
     async init(): Promise<void> {
+      if (!SIGNAL_9_LOCAL_AUDIO_ENABLED) {
+        audioReady = true;
+        emit('sound:init', {
+          engineName: 'signal-9-mp3-transmission',
+          src: 'disabled',
+          disabled: true,
+        });
+        return;
+      }
       try {
         await ensureAudioGraph();
       } catch (error) {
@@ -321,6 +333,7 @@ export function createMp3SoundEngineAdapter(
     },
 
     async start(): Promise<void> {
+      if (!SIGNAL_9_LOCAL_AUDIO_ENABLED) return;
       try {
         await ensureAudioGraph();
         if (audioContext?.state === 'suspended') {
@@ -392,6 +405,11 @@ export function createMp3SoundEngineAdapter(
     },
 
     async loadTrack(src: string, autoplay = false): Promise<void> {
+      if (!SIGNAL_9_LOCAL_AUDIO_ENABLED) {
+        currentAudioSrc = src;
+        emit('sound:track-change', { src, disabled: true });
+        return;
+      }
       const wasPlaying = playing;
       try {
         if (audio) {
@@ -431,6 +449,18 @@ export function createMp3SoundEngineAdapter(
     },
 
     getStatus(): SoundEngineStatus {
+      if (!SIGNAL_9_LOCAL_AUDIO_ENABLED) {
+        return {
+          initialized: audioReady,
+          audioReady,
+          playing: false,
+          engineState: 'idle',
+          currentSpecies: null,
+          currentPresetId,
+          level: 0,
+          lastError: null,
+        };
+      }
       return {
         initialized: audioReady,
         audioReady,

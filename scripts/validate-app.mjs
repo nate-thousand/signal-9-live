@@ -71,20 +71,27 @@ if (!exists(path.join(srcRoot, 'ui', 'VideoTransmissionControls.ts'))) {
 }
 
 const tracksTs = readFileSync(path.join(srcRoot, 'audio', 'transmissionTracks.ts'), 'utf8');
-for (const track of ['atmo-beats4', 'dead-wave-prime1', 'ghost-sonic-shadow', 'dust-data-loops']) {
+for (const track of ['logo-themes-1_PN', 'dust-data-loops']) {
   if (!tracksTs.includes(track)) {
     failures.push(`transmissionTracks.ts must map preset to track: ${track}`);
   }
 }
 
 for (const audioFile of [
-  'atmo-beats4.mp3',
-  'dead-wave-prime1.mp3',
-  'ghost-sonic-shadow.mp3',
+  'logo-themes-1_PN.mp3',
   'dust-data-loops.mp3',
+  'dj-null-memory-eraser.mp3',
+  'Boogie Times - 2026 - Mix 1_PN.mp3',
+  'Dub Mix - 02.07.26_PN.mp3',
 ]) {
   if (!exists(path.join(appRoot, 'public', 'assets', 'audio', audioFile))) {
     failures.push(`missing audio asset: public/assets/audio/${audioFile}`);
+  }
+}
+
+for (const videoFile of ['blackout-void.mp4', 'organic-vs-synthetic-2.mp4']) {
+  if (!exists(path.join(appRoot, 'public', 'assets', 'video', videoFile))) {
+    failures.push(`missing video asset: public/assets/video/${videoFile}`);
   }
 }
 

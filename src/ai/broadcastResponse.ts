@@ -43,6 +43,20 @@ export interface BroadcastChatRequest {
     unlockedLoreIds: string[];
     discoveredCharacterIds: string[];
     recentHistory: Array<{ role: string; text: string }>;
+    /** Active local transmission context — consumed by future API chat. */
+    activeMixtapeId?: string;
+    activeTransmissionTitle?: string;
+    playbackState?: string;
+    videoSourceId?: string;
+    asciiPresetId?: string;
+    audioReactive?: {
+      bass: number;
+      mid: number;
+      treble: number;
+      rms: number;
+      peak: number;
+      isPlaying: boolean;
+    };
   };
 }
 

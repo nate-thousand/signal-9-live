@@ -63,7 +63,7 @@ function stubResponse(request: BroadcastChatRequest): AiBroadcastResponse {
       track: 'interference',
       visualPreset: 'interference',
       asciiPreset: 'interference',
-      backgroundVideo: 'interference-static',
+      backgroundVideo: 'blackout-void',
       backgroundImage: 'img-static-field',
       unlockLore: [],
       discoverCharacters: [],
@@ -81,7 +81,7 @@ function stubResponse(request: BroadcastChatRequest): AiBroadcastResponse {
       track: 'uplink',
       visualPreset: 'uplink',
       asciiPreset: 'uplink',
-      backgroundVideo: 'uplink-data',
+      backgroundVideo: 'organic-vs-synthetic-2',
       backgroundImage: '',
       unlockLore: [],
       discoverCharacters: [
@@ -106,7 +106,7 @@ function stubResponse(request: BroadcastChatRequest): AiBroadcastResponse {
       track: 'broadcast',
       visualPreset: 'broadcast',
       asciiPreset: 'broadcast',
-      backgroundVideo: 'broadcast-feed',
+      backgroundVideo: 'organic-vs-synthetic-2',
       backgroundImage: 'img-relay-tower',
       unlockLore: [
         {
@@ -131,7 +131,7 @@ function stubResponse(request: BroadcastChatRequest): AiBroadcastResponse {
       track: 'jammer',
       visualPreset: 'jammer',
       asciiPreset: 'jammer',
-      backgroundVideo: 'jammer-pulse',
+      backgroundVideo: 'blackout-void',
       backgroundImage: '',
       unlockLore: [
         {

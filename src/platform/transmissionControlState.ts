@@ -81,6 +81,7 @@ export function applyTransmissionControlSync(controlId: string, sliderValue: num
 
 /** Push full profile to engine (preset / source change). */
 export function applyTransmissionProfileSync(profile: Signal9VideoAsciiProfile): void {
+  const visual = getSignal9VisualAdapter();
   loadTransmissionProfile(profile);
   for (const control of SIGNAL_9_VIDEO_SLIDER_CONTROLS) {
     const key =
@@ -89,6 +90,22 @@ export function applyTransmissionProfileSync(profile: Signal9VideoAsciiProfile):
     if (typeof value === 'number') {
       applyTransmissionControlSync(control.id, value);
     }
+  }
+  if (!visual) return;
+  if (typeof profile.speed === 'number') {
+    visual.setControlSync('speed', profile.speed);
+  }
+  if (typeof profile.trailAmount === 'number') {
+    visual.setControlSync('trailAmount', profile.trailAmount);
+  }
+  if (typeof profile.sourceContrast === 'number') {
+    visual.setControlSync('sourceContrast', profile.sourceContrast);
+  }
+  if (typeof profile.sourceEdge === 'number') {
+    visual.setControlSync('sourceEdge', profile.sourceEdge);
+  }
+  if (typeof profile.sourceBlend === 'number') {
+    visual.setControlSync('sourceBlend', profile.sourceBlend);
   }
 }
 

@@ -2,15 +2,17 @@ import type { Signal9PresetTrackId } from '../audio/transmissionTracks.js';
 import {
   getDefaultVideoForPreset,
   getVideoSourceById,
+  getVideoSourceBySrc,
   SIGNAL_9_DEFAULT_VIDEO_SOURCE,
   type Signal9VideoSource,
 } from '../config/videoSources.js';
 import { SIGNAL_9_VIDEO_GLYPH_SET } from '../config/emojiGlyphs.js';
-import { SIGNAL_9_VIDEO_PROFILE_MAP } from '../content/videoVisualPresets.js';
+import { SIGNAL_9_VIDEO_PROFILE_MAP, SIGNAL_9_VIDEO_BROADCAST } from '../content/videoVisualPresets.js';
 import { applyPresetTheme } from '../theme/applyPresetTheme.js';
 import { getAsciiColorForPreset } from '../theme/presetAsciiThemes.js';
 import type { Signal9PresetThemeId } from '../theme/applyPresetTheme.js';
 
+import { setActiveVisualBaseProfile } from './activeVisualProfile.js';
 import { getSignal9VisualAdapter } from './signal9VisualIntegration.js';
 import { startVisualLoop } from './transmissionSession.js';
 import { applySignal9VisualPerformance } from './signal9VisualPerformance.js';
@@ -46,7 +48,9 @@ export async function applyAsciiThemeColor(
 export async function applyVideoAsciiProfileForPreset(
   presetId: Signal9PresetTrackId | 'blackout',
 ): Promise<void> {
-  applyTransmissionProfileSync(SIGNAL_9_VIDEO_PROFILE_MAP[presetId]);
+  const profile = SIGNAL_9_VIDEO_PROFILE_MAP[presetId];
+  setActiveVisualBaseProfile(profile);
+  applyTransmissionProfileSync(profile);
 }
 
 /** Immediate slider → engine (sync, every input event). */
@@ -54,8 +58,22 @@ export function setVideoControlFromSlider(controlId: string, value: number): voi
   applyTransmissionControlSync(controlId, value);
 }
 
-async function loadVideoIntoEngine(
-  source: Signal9VideoSource,
+export type VisualEngineVideoLoadOptions = {
+  loop?: boolean;
+  muted?: boolean;
+  autoplay?: boolean;
+  fitMode?: 'fit' | 'fill' | 'stretch' | 'center';
+  /** When false, skip the video asset's default ASCII profile (e.g. mixtape presets). */
+  applySourceAsciiProfile?: boolean;
+};
+
+/**
+ * Load a URL through the Plantasonic Visual Engine VideoSource pipeline.
+ * Signal 9 does not decode or manage media — the engine owns loading and decoding.
+ */
+export async function loadVisualEngineVideoUrl(
+  src: string,
+  options: VisualEngineVideoLoadOptions = {},
 ): Promise<boolean> {
   const visual = getSignal9VisualAdapter();
   if (!visual) return false;
@@ -63,18 +81,122 @@ async function loadVideoIntoEngine(
   await applySignal9VisualPerformance(visual);
   await visual.prepareVideoAsciiPipeline();
   await visual.loadVideoSource({
-    src: source.src,
+    src,
+    loop: options.loop ?? true,
+    muted: options.muted ?? true,
+    autoplay: options.autoplay ?? true,
+    fitMode: options.fitMode ?? 'fit',
+  });
+
+  const status = visual.getVideoStatus();
+  return status.ready && !status.error;
+}
+
+/** Activate engine source mode so video frames drive the ASCII grid. */
+export async function enableVideoSourceMode(): Promise<void> {
+  const visual = getSignal9VisualAdapter();
+  if (!visual || !isVideoBackgroundEnabled()) return;
+
+  await visual.setSourceMode('source');
+  await visual.setVideoBackgroundEnabled(true);
+  await startVisualLoop();
+}
+
+/** Apply ASCII profile + theme for a local public/assets/video/ URL. */
+export async function applyVideoSourceAsciiProfile(src: string): Promise<void> {
+  const visual = getSignal9VisualAdapter();
+  if (!visual) return;
+
+  const meta = getVideoSourceBySrc(src);
+  const presetId = meta?.defaultPreset ?? 'broadcast';
+
+  setActiveVisualBaseProfile(SIGNAL_9_VIDEO_PROFILE_MAP[presetId]);
+  await visual.setGlyphSet([...SIGNAL_9_VIDEO_GLYPH_SET]);
+  await applyAsciiThemeColor(presetId);
+  applyTransmissionProfileSync(SIGNAL_9_VIDEO_PROFILE_MAP[presetId]);
+
+  const profile = SIGNAL_9_VIDEO_PROFILE_MAP[presetId];
+  if (typeof profile.sourceContrast === 'number') {
+    visual.setControlSync('sourceContrast', profile.sourceContrast);
+  }
+  if (typeof profile.sourceEdge === 'number') {
+    visual.setControlSync('sourceEdge', profile.sourceEdge);
+  }
+  if (typeof profile.sourceBlend === 'number') {
+    visual.setControlSync('sourceBlend', profile.sourceBlend);
+  }
+}
+
+function resolveLocalVideoSource(ref: string): Signal9VideoSource | undefined {
+  return getVideoSourceById(ref) ?? getVideoSourceBySrc(ref);
+}
+
+/**
+ * Load a configured video source id or local asset URL and activate ASCII source mode.
+ * Mixtapes pass `videoSourceId`; ambient playlist passes discovered `/assets/video/` URLs.
+ */
+export async function activateLocalVideoSourceMode(
+  videoSourceIdOrSrc: string,
+  options: VisualEngineVideoLoadOptions = {},
+): Promise<boolean> {
+  const { applySourceAsciiProfile = true, ...loadOptions } = options;
+  const source = resolveLocalVideoSource(videoSourceIdOrSrc);
+  const src = source?.src ?? videoSourceIdOrSrc;
+
+  const loaded = await loadVisualEngineVideoUrl(src, {
+    loop: source?.loop ?? true,
+    muted: source?.muted ?? true,
+    autoplay: loadOptions.autoplay ?? true,
+    fitMode: loadOptions.fitMode ?? 'fill',
+    ...loadOptions,
+  });
+  if (!loaded) return false;
+
+  if (applySourceAsciiProfile) {
+    await applyVideoSourceAsciiProfile(src);
+  }
+  await enableVideoSourceMode();
+  return true;
+}
+
+/** Signal 9 broadcast surveillance ASCII profile — purple terminal aesthetic. */
+export async function applySignal9AsciiSurveillanceProfile(): Promise<void> {
+  const visual = getSignal9VisualAdapter();
+  if (!visual) return;
+
+  setActiveVisualBaseProfile(SIGNAL_9_VIDEO_BROADCAST);
+  await visual.setGlyphSet([...SIGNAL_9_VIDEO_GLYPH_SET]);
+  await applyAsciiThemeColor('broadcast');
+  applyTransmissionProfileSync(SIGNAL_9_VIDEO_BROADCAST);
+}
+
+/** Enable video-to-ASCII sampling and start engine playback. */
+export async function startVisualEngineVideoPlayback(): Promise<void> {
+  const visual = getSignal9VisualAdapter();
+  if (!visual) return;
+
+  await startVisualLoop();
+  if (isVideoBackgroundEnabled()) {
+    await visual.setVideoBackgroundEnabled(true);
+  }
+  await visual.playVideo();
+}
+
+async function loadVideoIntoEngine(
+  source: Signal9VideoSource,
+): Promise<boolean> {
+  const loaded = await activateLocalVideoSourceMode(source.src, {
     loop: source.loop,
     muted: source.muted,
     autoplay: true,
+    fitMode: 'fill',
   });
+  if (loaded) return true;
 
-  let status = visual.getVideoStatus();
-  if (status.ready && !status.error) {
-    return true;
-  }
+  const visual = getSignal9VisualAdapter();
+  if (!visual) return false;
 
-  console.warn('[signal-9] video load failed, trying demo fallback:', status.error, source.src);
+  console.warn('[signal-9] video load failed, trying demo fallback:', source.src);
 
   const demoVideo = await primeDemoVideo();
   await visual.loadVideoSource({
@@ -84,7 +206,7 @@ async function loadVideoIntoEngine(
     autoplay: true,
   });
 
-  status = visual.getVideoStatus();
+  const status = visual.getVideoStatus();
   return status.ready && !status.error;
 }
 
@@ -105,6 +227,7 @@ export async function loadVideoSourceById(sourceId: string): Promise<void> {
   if (!loaded) return;
 
   applyTransmissionProfileSync(SIGNAL_9_VIDEO_PROFILE_MAP[source.defaultPreset]);
+  setActiveVisualBaseProfile(SIGNAL_9_VIDEO_PROFILE_MAP[source.defaultPreset]);
   applyPresetTheme(source.defaultPreset);
   await applyAsciiThemeColor(source.defaultPreset);
   await visual.setGlyphSet([...SIGNAL_9_VIDEO_GLYPH_SET]);
@@ -133,6 +256,7 @@ export async function activateVideoAsciiForPreset(
   await visual.setGlyphSet([...SIGNAL_9_VIDEO_GLYPH_SET]);
   await applyAsciiThemeColor(presetId);
   applyTransmissionProfileSync(SIGNAL_9_VIDEO_PROFILE_MAP[presetId]);
+  setActiveVisualBaseProfile(SIGNAL_9_VIDEO_PROFILE_MAP[presetId]);
 
   await startVisualLoop();
   if (isVideoBackgroundEnabled()) {

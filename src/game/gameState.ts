@@ -16,7 +16,7 @@ function createInitialState(): BroadcastGameState {
     currentMood: 'tense',
     currentVisualPreset: 'broadcast',
     currentAsciiPreset: 'broadcast',
-    backgroundVideo: 'broadcast-feed',
+    backgroundVideo: 'organic-vs-synthetic-2',
     backgroundImage: '',
     unlockedLore: [
       {

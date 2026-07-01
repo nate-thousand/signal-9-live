@@ -116,12 +116,50 @@
   min-block-size: 2rem;
   padding: 0.45rem 0.6rem;
   border-block-end: 1px solid color-mix(in srgb, var(--s9-accent, #9b5dff) 25%, transparent);
+  flex-shrink: 0;
+}
+
+.s9-broadcast__panel-toggle {
+  flex-shrink: 0;
+  inline-size: 1.45rem;
+  block-size: 1.45rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--s9-accent, #9b5dff) 38%, transparent);
+  background: color-mix(in srgb, var(--s9-bg, #030306) 78%, transparent);
+  color: var(--s9-text, #f1eef7);
+  font: inherit;
+  font-size: 0.85em;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.s9-broadcast__panel-toggle:hover {
+  border-color: var(--s9-accent, #9b5dff);
+  color: var(--s9-accent, #9b5dff);
+}
+
+.s9-broadcast__panel-toggle-icon {
+  display: block;
+  text-align: center;
 }
 
 .s9-broadcast__panel-title,
 .s9-broadcast__subhead {
   margin: 0;
   font-size: 0.68em;
+}
+
+.s9-broadcast__panel-chrome .s9-broadcast__panel-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s9-broadcast__panel-chrome .s9-broadcast__panel-state {
+  flex-shrink: 0;
 }
 
 .s9-broadcast__panel-state {
@@ -297,6 +335,41 @@
   inset-block-end: 0.55rem;
 }
 
+.s9-broadcast__visual-viewport {
+  position: absolute;
+  inset: 3rem 2.4rem;
+  z-index: 1;
+  overflow: hidden;
+  min-height: 0;
+  pointer-events: none;
+
+  .ps-stage__canvas {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
+
+.s9-broadcast__visual-standby {
+  position: absolute;
+  inset: 3rem 2.4rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--s9-accent, #9b5dff) 72%, var(--s9-text, #f1eef7));
+  font: 0.58em/1.35 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.06em;
+  text-align: center;
+  white-space: pre;
+  pointer-events: none;
+}
+
 .s9-broadcast__visual-reticle {
   position: absolute;
   inset: 3rem 2.4rem;
@@ -338,16 +411,50 @@
 
 .s9-broadcast__right {
   grid-area: right;
-  display: grid;
-  grid-template-rows: minmax(0, 1.15fr) minmax(10rem, 0.85fr);
-  gap: 0.7rem;
-  min-height: 0;
-  margin: 0.7rem 0.7rem 0.7rem 0;
-}
-
-.s9-broadcast__radio {
   display: flex;
   flex-direction: column;
+  gap: 0.7rem;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  margin: 0.7rem 0.7rem 0.7rem 0;
+  contain: layout style;
+}
+
+.s9-broadcast__right > [data-s9-collapsible-panel] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+  overflow: hidden;
+  contain: layout style;
+}
+
+.s9-broadcast__right > .s9-broadcast__radio:not(.s9-broadcast__panel--collapsed) {
+  flex: 1.35 1 0;
+}
+
+.s9-broadcast__right > .s9-broadcast__mission:not(.s9-broadcast__panel--collapsed) {
+  flex: 1 1 0;
+}
+
+.s9-broadcast__right > .s9-broadcast__panel--collapsed {
+  flex: 0 0 auto;
+  grid-template-rows: auto 0fr;
+}
+
+.s9-broadcast__panel-body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.s9-broadcast__panel--collapsed .s9-broadcast__panel-body {
+  visibility: hidden;
+}
+
+.s9-radio__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
@@ -471,10 +578,18 @@
   accent-color: var(--s9-accent, #9b5dff);
 }
 
-.s9-broadcast__mission {
+.s9-broadcast__mission-body {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr);
   gap: 0.5rem;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 12rem;
+}
+
+.s9-broadcast__mission {
   min-height: 0;
 }
 
@@ -709,9 +824,15 @@
   }
 
   .s9-broadcast__right {
-    grid-template-columns: minmax(18rem, 1fr) minmax(18rem, 1fr);
-    grid-template-rows: 1fr;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: stretch;
     margin: 0 0.7rem 0.7rem;
+  }
+
+  .s9-broadcast__right > [data-s9-collapsible-panel] {
+    flex: 1 1 min(100%, 18rem);
+    min-block-size: min(22rem, 42vh);
   }
 }
 
@@ -738,8 +859,17 @@
   }
 
   .s9-broadcast__right {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(10rem, 1fr);
+    flex-direction: column;
+    margin: 0.5rem;
+  }
+
+  .s9-broadcast__right > [data-s9-collapsible-panel] {
+    flex: 1 1 auto;
+    min-block-size: min(16rem, 38vh);
+  }
+
+  .s9-broadcast__right > .s9-broadcast__panel--collapsed {
+    min-block-size: 0;
   }
 
   .s9-broadcast__hud {

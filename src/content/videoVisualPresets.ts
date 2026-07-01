@@ -16,6 +16,10 @@ export interface Signal9VideoAsciiProfile {
   trailAmount: number;
   /** sourceEdge — edge emphasis for static / interference themes */
   sourceEdge?: number;
+  /** Video source contrast multiplier (engine default 1.0) */
+  sourceContrast?: number;
+  /** Video source blend strength (engine default 1.0) */
+  sourceBlend?: number;
 }
 
 /** Broadcast — clean violet CRT transmission */
@@ -30,6 +34,8 @@ export const SIGNAL_9_VIDEO_BROADCAST: Signal9VideoAsciiProfile = {
   speed: 0.3,
   trailAmount: 0.28,
   sourceEdge: 0.35,
+  sourceContrast: 1,
+  sourceBlend: 1,
 };
 
 /** Interference — cyan static corruption, aggressive glitch */
@@ -44,6 +50,8 @@ export const SIGNAL_9_VIDEO_INTERFERENCE: Signal9VideoAsciiProfile = {
   speed: 0.72,
   trailAmount: 0.05,
   sourceEdge: 0.48,
+  sourceContrast: 1.05,
+  sourceBlend: 0.95,
 };
 
 /** Jammer — fuchsia feedback bursts, broken particle field */
@@ -58,6 +66,8 @@ export const SIGNAL_9_VIDEO_JAMMER: Signal9VideoAsciiProfile = {
   speed: 0.8,
   trailAmount: 0.1,
   sourceEdge: 0.42,
+  sourceContrast: 1.08,
+  sourceBlend: 0.88,
 };
 
 /** Uplink — emerald high-contrast data geometry */
@@ -72,6 +82,8 @@ export const SIGNAL_9_VIDEO_UPLINK: Signal9VideoAsciiProfile = {
   speed: 0.54,
   trailAmount: 0.38,
   sourceEdge: 0.38,
+  sourceContrast: 1.12,
+  sourceBlend: 0.92,
 };
 
 /** Blackout — slate void, crushed visibility */
@@ -86,6 +98,8 @@ export const SIGNAL_9_VIDEO_BLACKOUT: Signal9VideoAsciiProfile = {
   speed: 0.58,
   trailAmount: 0.02,
   sourceEdge: 0.5,
+  sourceContrast: 0.92,
+  sourceBlend: 0.78,
 };
 
 export const SIGNAL_9_VIDEO_PROFILE_MAP: Record<

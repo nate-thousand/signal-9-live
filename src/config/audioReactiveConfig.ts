@@ -46,3 +46,36 @@ export function boostMappingAmount(amount: number): number {
   const { mappingGain, ceiling } = SIGNAL_9_AUDIO_REACTIVE;
   return Math.min(ceiling, amount * mappingGain);
 }
+
+/** Video source sampling reactivity — contrast, edge, blend modulation ranges. */
+export const SIGNAL_9_SOURCE_REACTIVITY = {
+  contrastRange: [0.85, 1.55] as const,
+  edgeRange: [0.2, 0.72] as const,
+  blendRange: [0.65, 1.0] as const,
+  gain: 1.4,
+} as const;
+
+function lerpRange(range: readonly [number, number], t: number): number {
+  return range[0] + (range[1] - range[0]) * Math.min(1, Math.max(0, t));
+}
+
+export function mapSourceContrastReactive(base: number, amplitude: number, rms: number, transient: number): number {
+  const { contrastRange, gain } = SIGNAL_9_SOURCE_REACTIVITY;
+  const drive = Math.min(1, (amplitude * 0.55 + rms * 0.35 + transient * 0.45) * gain);
+  const reactive = lerpRange(contrastRange, drive);
+  return base * 0.45 + reactive * 0.55 + transient * 0.12;
+}
+
+export function mapSourceEdgeReactive(base: number, bass: number, peak: number): number {
+  const { edgeRange, gain } = SIGNAL_9_SOURCE_REACTIVITY;
+  const drive = Math.min(1, (bass * 0.7 + peak * 0.5) * gain);
+  const target = lerpRange(edgeRange, drive);
+  return base + (target - base) * Math.min(1, drive);
+}
+
+export function mapSourceBlendReactive(base: number, mid: number, treble: number): number {
+  const { blendRange } = SIGNAL_9_SOURCE_REACTIVITY;
+  const dip = treble * 0.22;
+  const lift = mid * 0.18;
+  return Math.min(blendRange[1], Math.max(blendRange[0], base - dip + lift));
+}

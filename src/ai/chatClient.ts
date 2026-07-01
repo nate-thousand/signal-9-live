@@ -1,17 +1,19 @@
 import type { AiBroadcastResponse, BroadcastChatRequest } from './broadcastResponse.js';
 import { normalizeAiBroadcastResponse } from './broadcastResponse.js';
 import { broadcastGameState } from '../game/gameState.js';
+import { getActiveTransmissionContext } from '../platform/activeTransmission.js';
 
 const CHAT_ENDPOINT = '/api/broadcast/chat';
 
 function buildRequest(message: string, choice?: string): BroadcastChatRequest {
   const state = broadcastGameState.getState();
+  const { transmission, audioReactive } = getActiveTransmissionContext();
   return {
     message,
     choice,
     gameState: {
       currentLocation: state.currentLocation,
-      currentMission: state.currentMission,
+      currentMission: transmission.mission || state.currentMission,
       currentTrack: state.currentTrack,
       currentMood: state.currentMood,
       unlockedLoreIds: state.unlockedLore.map((l) => l.id),
@@ -20,6 +22,19 @@ function buildRequest(message: string, choice?: string): BroadcastChatRequest {
         role: t.role,
         text: t.text,
       })),
+      activeMixtapeId: transmission.mixtapeId,
+      activeTransmissionTitle: transmission.title,
+      playbackState: transmission.playbackState,
+      videoSourceId: transmission.videoSourceId,
+      asciiPresetId: transmission.asciiPresetId,
+      audioReactive: {
+        bass: audioReactive.bass,
+        mid: audioReactive.mid,
+        treble: audioReactive.treble,
+        rms: audioReactive.rms,
+        peak: audioReactive.peak,
+        isPlaying: audioReactive.isPlaying,
+      },
     },
   };
 }

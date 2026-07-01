@@ -1,5 +1,6 @@
-import { SIGNAL_9_AMBIENT_TRACKS, SIGNAL_9_PRESET_TRACK_LIST } from '../audio/transmissionTracks.js';
-import { SIGNAL_9_VIDEO_SOURCES } from '../config/videoSources.js';
+import { SIGNAL_9_AMBIENT_TRACKS, SIGNAL_9_PRESET_TRACK_LIST, SIGNAL_9_PRESET_TRACKS } from '../audio/transmissionTracks.js';
+import { SIGNAL_9_MIXTAPE_PRESETS } from '../config/mixtapePresets.js';
+import { SIGNAL_9_VIDEO_SOURCES, getDefaultVideoForPreset } from '../config/videoSources.js';
 import { SIGNAL_9_PRESET_BUNDLES } from '../content/presetBundles.js';
 
 /** Shared manifest asset fields */
@@ -87,8 +88,8 @@ function songAssets(): SongAsset[] {
       location: 'Sector 9',
       faction: 'Signal 9',
       mission: 'broadcast',
-      relatedAssets: [`video-${entry.id === 'broadcast' ? 'broadcast-feed' : entry.id}`],
-      filePath: entry.track,
+      relatedAssets: [getDefaultVideoForPreset(entry.id)?.id ?? 'organic-vs-synthetic-2'],
+      filePath: SIGNAL_9_PRESET_TRACKS[entry.id],
       presetId: entry.id,
       bpm: bundle?.ui?.tempo,
     };
@@ -110,6 +111,23 @@ function ambientSongAssets(): SongAsset[] {
     relatedAssets: [],
     filePath: entry.src,
     presetId: entry.id,
+  }));
+}
+
+function mixtapeSongAssets(): SongAsset[] {
+  return SIGNAL_9_MIXTAPE_PRESETS.map((preset) => ({
+    kind: 'song',
+    id: preset.id,
+    title: preset.title,
+    description: `${preset.artist} — ${preset.title} local mixtape.`,
+    tags: ['signal-9', 'audio', 'mixtape', 'local-tape'],
+    mood: 'recovered',
+    location: 'Sector 9',
+    faction: 'Signal 9',
+    mission: preset.mission,
+    relatedAssets: [preset.videoSourceId, preset.asciiPresetId],
+    filePath: preset.audioSrc,
+    presetId: preset.asciiPresetId,
   }));
 }
 
@@ -155,7 +173,7 @@ const PLACEHOLDER_IMAGES: ImageAsset[] = [
     location: 'Dead Grid',
     faction: 'Unknown',
     mission: 'grid-breach',
-    relatedAssets: ['interference', 'interference-static'],
+    relatedAssets: ['interference', 'blackout-void'],
     filePath: '/assets/images/static-field.svg',
   },
 ];
@@ -201,7 +219,7 @@ const CHARACTER_ASSETS: CharacterAsset[] = [
     location: 'Jammer Corridor',
     faction: 'Corp Static',
     mission: 'grid-breach',
-    relatedAssets: ['jammer', 'jammer-pulse'],
+    relatedAssets: ['jammer', 'blackout-void'],
   },
 ];
 
@@ -217,7 +235,7 @@ const LOCATION_ASSETS: LocationAsset[] = [
     location: 'Sector 9',
     faction: 'Signal 9',
     mission: 'establish-uplink',
-    relatedAssets: ['broadcast', 'broadcast-feed'],
+    relatedAssets: ['broadcast', 'organic-vs-synthetic-2'],
   },
   {
     kind: 'location',
@@ -230,7 +248,7 @@ const LOCATION_ASSETS: LocationAsset[] = [
     location: 'Dead Grid',
     faction: 'Unknown',
     mission: 'grid-breach',
-    relatedAssets: ['interference', 'interference-static'],
+    relatedAssets: ['interference', 'blackout-void'],
   },
   {
     kind: 'location',
@@ -243,7 +261,7 @@ const LOCATION_ASSETS: LocationAsset[] = [
     location: 'Jammer Corridor',
     faction: 'Corp Static',
     mission: 'extraction',
-    relatedAssets: ['jammer', 'jammer-pulse'],
+    relatedAssets: ['jammer', 'blackout-void'],
   },
 ];
 
@@ -293,7 +311,7 @@ const LORE_ASSETS: LoreAsset[] = [
 ];
 
 export const SIGNAL_9_ASSET_MANIFEST: Signal9AssetManifest = {
-  songs: [...songAssets(), ...ambientSongAssets()],
+  songs: [...songAssets(), ...ambientSongAssets(), ...mixtapeSongAssets()],
   videos: videoAssets(),
   images: PLACEHOLDER_IMAGES,
   characters: CHARACTER_ASSETS,

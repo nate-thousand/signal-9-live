@@ -1,34 +1,14 @@
-# Signal 9 Video Assets
+# Signal 9 video assets
 
-Pixel flower loops for **video-to-ASCII** broadcast visuals.
+Place local MP4 loops in this folder. Files are auto-discovered at dev/build time into `playlist.json`.
 
-## Theme mapping
+## Current local inventory
 
-| File | Preset | Source flower |
-|------|--------|---------------|
-| `broadcast-loop.mp4` | Broadcast | `21a89395…_1.mp4` |
-| `interference-static.mp4` | Interference | `21a89395…_2.mp4` |
-| `jammer-pulse.mp4` | Jammer | `b1855f95…_2.mp4` |
-| `uplink-data.mp4` | Uplink | `f963c5fe…_3.mp4` |
-| `blackout-void.mp4` | Blackout | `f963c5fe…_3.mp4` (shared uplink loop) |
+| File | Video source id | Default ASCII preset |
+|------|-----------------|----------------------|
+| `blackout-void.mp4` | `blackout-void` | `blackout` |
+| `organic-vs-synthetic-2.mp4` | `organic-vs-synthetic-2` | `broadcast` |
 
-Configured in `src/config/videoSources.ts`. Each preset applies a distinct ASCII profile in `src/content/videoVisualPresets.ts`.
+Mixtape pairings are configured in `src/config/mixtapePresets.ts` (`videoSourceId`).
 
-## Requirements
-
-- **Format:** MP4 (H.264)
-- **Loop:** Short loops work best
-- **Audio:** Video is muted; mission audio comes from MP3 presets
-- **CORS:** Served from `/assets/video/` on the same origin
-
-## Routing
-
-```
-public/assets/video/*.mp4
-  → VisualEngineAdapter.loadVideoSource()
-  → ascii-visual-engine VideoSource
-  → ASCII renderer (stage canvas)
-  → Audio Reactive Bridge
-```
-
-If MP4 files are missing, a canvas demo stream is used as fallback (`src/platform/videoDemoSource.ts`).
+Video audio is always muted — MP3 playback drives the transmission.

@@ -34,8 +34,7 @@ After **Cold boot → Signal authentication → Press ENTER**, the player enters
 2. **Local scripted game loop** — fixed mission script with client-side d20 rolls before full ChatGPT connection
 3. **Production AI API** — serverless route for static `dist/` deployments
 4. **Plantasonic Platform Integration implementation prep** — review the import map and approve the future Platform/App Kit mount API before runtime import changes
-5. **External radio ingest** — connect Mixcloud, SoundCloud, and streaming radio modes beyond prototype source selection
-6. **Rich lore panel** — render full transmission body text, not just titles
+5. **Rich lore panel** — render full transmission body text, not just titles
 7. **GIF export UI** — wire engine export APIs to Menu panel (documented but not built)
 8. **Mission completion flow** — wire debrief or remove dead navigation paths
 
@@ -164,9 +163,8 @@ Mission audio uses local MP3 files analyzed via Web Audio (`mp3SoundEngineAdapte
 | `startup.mp3` on disk | 🚧 | Present but not wired in code |
 | Playlist / queue support | 🚧 | Deck can step carrier presets + ambient tapes; no persisted queue |
 | Crossfade between tracks | ⬜ | — |
-| Mixcloud integration | 🚧 | Source selector exists; ingest/auth pending |
-| SoundCloud integration | 🚧 | Source selector exists; ingest/auth pending |
-| Streaming radio mode | 🚧 | Source selector exists; stream URL handling pending |
+| Local mixtape preset config | ✅ | `SIGNAL_9_MIXTAPE_PRESETS` links MP3, video source id, ASCII preset |
+| Streaming radio ingest | ⬜ | Deferred — app is fully local MP3 based |
 | Asset manifest (songs) | ✅ | `src/assets/manifest.ts` |
 
 ### Dependencies
