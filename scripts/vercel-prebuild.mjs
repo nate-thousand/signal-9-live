@@ -12,8 +12,10 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const parent = path.resolve(repoRoot, '..');
 
+const plantasonicXyzRoot = path.join(parent, 'plantasonic-xyz');
+const designSystemRoot = path.join(plantasonicXyzRoot, 'plantasonic-design-system');
+
 const platformRoot = path.join(parent, 'plantasonic-platform');
-const designSystemRoot = path.join(parent, 'plantasonic-xyz', 'plantasonic-design-system');
 
 function log(message) {
   console.log(`[vercel-prebuild] ${message}`);
@@ -38,7 +40,7 @@ function pnpm(command, cwd) {
 }
 
 cloneIfMissing('https://github.com/nate-thousand/plantasonic-platform.git', platformRoot);
-cloneIfMissing('https://github.com/nate-thousand/plantasonic-design-system.git', designSystemRoot);
+cloneIfMissing('https://github.com/nate-thousand/plantasonic.git', plantasonicXyzRoot);
 
 pnpm('install --ignore-scripts', platformRoot);
 
