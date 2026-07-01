@@ -53,6 +53,10 @@ for (const pkg of platformPackages) {
   const pkgRoot = path.join(platformRoot, pkg);
   if (pkg.endsWith('visual-engine')) {
     run('npm run build', pkgRoot);
+  } else if (pkg.endsWith('sound-engine')) {
+    run('node scripts/sync-presets.mjs', pkgRoot);
+    run('npx tsc -p tsconfig.json', pkgRoot);
+    run('mkdir -p dist/presets && cp -r src/presets/bundled dist/presets/bundled', pkgRoot);
   } else {
     run('npx tsc -p tsconfig.json', pkgRoot);
   }
