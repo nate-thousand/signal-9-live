@@ -349,14 +349,16 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
 }
 
 .s9-radio__art {
   position: relative;
   display: grid;
   place-items: center;
-  min-block-size: clamp(5rem, 17vh, 10rem);
+  min-block-size: clamp(3.4rem, 9vh, 6rem);
   margin: 0.65rem;
   border: 1px solid color-mix(in srgb, var(--s9-text, #f1eef7) 14%, transparent);
   overflow: hidden;
