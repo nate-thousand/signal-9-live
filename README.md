@@ -29,8 +29,8 @@ Underground resistance broadcast experience built on [Plantasonic Platform](http
 |------|--------|
 | Entry Screen / ASCII logo / title sequence | **Live** — cold boot, diagnostics, Signal acquisition, press ENTER |
 | Home Terminal shell | **Live** — left chat, center ASCII engine, right radio, bottom HUD |
-| Signal 9 Radio (local MP3 mixtapes) | **Live** — local soundtrack playback, track selector, waveform, spectrum, volume |
-| Radio source | **Local only** — `public/assets/audio/` mixtapes and carrier presets |
+| Signal 9 Radio (local soundtrack) | **Live** — local soundtrack playback, track selector, waveform, spectrum, volume |
+| Radio source | **Local** — versioned soundtrack files and carrier presets in `public/assets/audio/` |
 | AI Chat Terminal | **Live** — stub AI offline; OpenAI when `OPENAI_API_KEY` set |
 | ASCII Visual Display | **Live** — existing video-to-ASCII engine + audio reactive bridge |
 | Bottom HUD telemetry | **Live** — frequency, signal, Echo, Memory Nodes, TX, CPU, FPS, mission, district, time |
@@ -92,8 +92,8 @@ Local audio lives in `public/assets/audio/`:
 |------|------|
 | Broadcast carrier | `logo-themes-1_PN.mp3` |
 | Uplink carrier | `dust-data-loops.mp3` |
-| Mixtape | `Boogie Times - 2026 - Mix 1_PN.mp3` |
-| Mixtape | `Dub Mix - 02.07.26_PN.mp3` |
+| Recovered track | `PANEL 101_ Silence Verse (Edit) (final edit).wav` |
+| Recovered track | `dj-null-memory-eraser.mp3` |
 | Ambient tape | `dj-null-memory-eraser.mp3` |
 
 Carrier presets **Interference** and **Jammer** still drive ASCII/visual profiles; their MP3 aliases map to `dust-data-loops.mp3` until dedicated files are added.
@@ -453,4 +453,5 @@ Respects `prefers-reduced-motion: reduce` for flicker and flash animations.
 ## License
 
 Source available for portfolio review. All rights reserved; no license is granted for reuse or redistribution.
+
 
