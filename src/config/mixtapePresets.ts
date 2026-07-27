@@ -64,10 +64,10 @@ export const MIXTAPE_TINT_COLORS: Record<MixtapeTint, string> = {
 /** Local MP3 ↔ video source ↔ ASCII profile pairings for Signal 9 Radio mixtapes. */
 export const SIGNAL_9_MIXTAPE_PRESETS: Signal9MixtapePreset[] = [
   {
-    id: 'boogie-times-2026-mix-1',
-    title: 'Boogie Times — Mix 1',
-    artist: 'Nate Thousand Fingers',
-    audioSrc: '/assets/audio/Boogie%20Times%20-%202026%20-%20Mix%201_PN.mp3',
+    id: 'silence-verse-edit',
+    title: 'Silence Verse — Edit',
+    artist: 'Panel 101',
+    audioSrc: '/assets/audio/PANEL%20101_%20Silence%20Verse%20(Edit)%20(final%20edit).wav',
     videoSourceId: 'blackout-void',
     asciiPresetId: 'broadcast',
     status: 'LOCAL TAPE',
@@ -91,10 +91,10 @@ export const SIGNAL_9_MIXTAPE_PRESETS: Signal9MixtapePreset[] = [
     },
   },
   {
-    id: 'dub-mix-02-07-26',
-    title: 'Dub Mix — 02.07.26',
-    artist: 'Nate Thousand Fingers',
-    audioSrc: '/assets/audio/Dub%20Mix%20-%2002.07.26_PN.mp3',
+    id: 'memory-eraser-mixtape',
+    title: 'Memory Eraser',
+    artist: 'DJ Null',
+    audioSrc: '/assets/audio/dj-null-memory-eraser.mp3',
     videoSourceId: 'organic-vs-synthetic-2',
     asciiPresetId: 'jammer',
     status: 'LOCAL TAPE',
@@ -175,3 +175,4 @@ export function getMixtapePresetByAudioSrc(audioSrc: string): Signal9MixtapePres
 export function getMixtapeDeckTrackId(presetId: string): `mixtape-${string}` {
   return `mixtape-${presetId}`;
 }
+
