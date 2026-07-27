@@ -81,8 +81,7 @@ for (const audioFile of [
   'logo-themes-1_PN.mp3',
   'dust-data-loops.mp3',
   'dj-null-memory-eraser.mp3',
-  'Boogie Times - 2026 - Mix 1_PN.mp3',
-  'Dub Mix - 02.07.26_PN.mp3',
+  'PANEL 101_ Silence Verse (Edit) (final edit).wav',
 ]) {
   if (!exists(path.join(appRoot, 'public', 'assets', 'audio', audioFile))) {
     failures.push(`missing audio asset: public/assets/audio/${audioFile}`);
@@ -152,3 +151,4 @@ if (failures.length) {
 }
 
 console.log('App validation passed');
+
