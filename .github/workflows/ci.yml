@@ -22,16 +22,19 @@ jobs:
         with:
           repository: nate-thousand/plantasonic-platform
           path: plantasonic-platform
-      - name: Check out design system dependency
+      - name: Check out matching Plantasonic workspace
         uses: actions/checkout@v5
         with:
-          repository: nate-thousand/plantasonic-design-system
-          path: plantasonic-xyz/plantasonic-design-system
+          repository: nate-thousand/plantasonic
+          path: plantasonic-xyz
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: signal-9-live/package-lock.json
+      - name: Prepare sibling dependencies
+        run: node scripts/vercel-prebuild.mjs
+        working-directory: signal-9-live
       - run: npm ci
         working-directory: signal-9-live
       - run: npm run validate
