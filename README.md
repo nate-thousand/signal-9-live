@@ -2,7 +2,9 @@
 
 Underground resistance broadcast experience built on [Plantasonic Platform](https://github.com/) architecture — a **standalone** app that references the platform without living inside its monorepo.
 
-**Chat is the game.** After the cold boot entry sequence, the **Home Terminal** becomes the permanent interface: left-side chat, center ASCII Visual Engine, right-side Signal 9 Radio, and a bottom system HUD. GHOST (AI) narrates, missions evolve through conversation, and every response can retune soundtrack, video-to-ASCII, lore, and mission state.
+**Chat is the game.
+
+**[Launch the live experience](https://signal-9-live.vercel.app/)**** After the cold boot entry sequence, the **Home Terminal** becomes the permanent interface: left-side chat, center ASCII Visual Engine, right-side Signal 9 Radio, and a bottom system HUD. GHOST (AI) narrates, missions evolve through conversation, and every response can retune soundtrack, video-to-ASCII, lore, and mission state.
 
 > **Development status:** See [ROADMAP.md](ROADMAP.md) — the single source of truth for phases, completion status, and milestones.
 
@@ -450,4 +452,5 @@ Respects `prefers-reduced-motion: reduce` for flicker and flash animations.
 
 ## License
 
-Private
+Source available for portfolio review. All rights reserved; no license is granted for reuse or redistribution.
+
