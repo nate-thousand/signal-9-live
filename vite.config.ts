@@ -148,7 +148,7 @@ export default defineConfig(({ mode }) => {
         'src/platform/signal9InstrumentApp.ts',
       ),
       '@plantasonic/platform-demo': demoRoot,
-      'ascii-visual-engine': path.resolve(platformRoot, 'packages/visual-engine/src/index.ts'),
+      'ascii-visual-engine': path.resolve(__dirname, '../ascii-visual-engine/src/index.ts'),
       'plantasonic-design-system/shell': path.resolve(dsRoot, 'src/shell/index.ts'),
       'plantasonic-design-system/instrument': path.resolve(dsRoot, 'src/instrument/index.ts'),
       'plantasonic-design-system/creative-workspace': path.resolve(
@@ -166,7 +166,7 @@ export default defineConfig(({ mode }) => {
   },
   optimizeDeps: {
     include: ['tone', 'plantasia-sound-engine'],
-    // Always bundle from ../visual-engine/src via alias — avoids stale dist in .vite cache.
+    // Always bundle from ../ascii-visual-engine/src via alias — avoids stale dist in .vite cache.
     exclude: ['ascii-visual-engine'],
   },
   server: {

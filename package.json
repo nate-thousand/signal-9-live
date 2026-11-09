@@ -14,7 +14,7 @@
   "dependencies": {
     "@plantasonic/platform": "file:../plantasonic-platform/packages/sdk",
     "@plantasonic/platform-types": "file:../plantasonic-platform/packages/shared-types",
-    "ascii-visual-engine": "file:../plantasonic-platform/packages/visual-engine",
+    "ascii-visual-engine": "file:../ascii-visual-engine",
     "bootstrap": "^5.0.2",
     "plantasia-sound-engine": "file:../plantasonic-platform/packages/sound-engine",
     "plantasonic-design-system": "file:../plantasonic-xyz/plantasonic-design-system"
